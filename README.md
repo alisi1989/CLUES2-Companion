@@ -84,7 +84,7 @@ CLUES‑Companion/
 
  <a name="quick-start"></a> ## Quick start (Chromosome 2, gene MCM6)
 
- # Phase‑1   (Relate → .anc/.mut → .coal → SNP extraction …)
+ ## Phase‑1   (Relate → .anc/.mut → .coal → SNP extraction …)
 ./clues_pipeline.sh
 choose option 1 and follow prompts
 
@@ -96,7 +96,7 @@ choose option 1 and follow prompts
 ‑ output prefix: DOUZ
 Outputs land in   working‑dir/phase1/
 
-Phase‑2   (branch lengths → CLUES → merge + plot)
+ ## Phase‑2   (branch lengths → CLUES → merge + plot)
 ./clues_pipeline.sh
 choose option 2 and answer:
 
