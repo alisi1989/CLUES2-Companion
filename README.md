@@ -110,15 +110,15 @@ Output base prefix (e.g. Finnish): Finnish
 output dir `working-dir` and subfolder for each phase are automatically created and the outputs land automatically in `working‑dir/phase1/`
 
  ## Phase‑2   (branch lengths → CLUES → merge + plot)
+ 
+ example:
 ```
 ./CLUES2Companion.sh
 choose option 2 and answer:
 
 ‑ chromosome: 2
-‑ population prefix: DOUZ
+‑ population prefix: Finnish
 ‑ accept auto‑detected Frequency & SNP files
-‑ Relate prefix: working‑dir/phase1/DOUZ_GS_chr2
-‑ CI: 0.98
 ```
 
 Final table:  working‑dir/phase2/DOUZ_merged_inference_chr2.tsv
@@ -128,41 +128,49 @@ output dir `working-dir` and subfolder for each phase are automatically created 
 
 <a name="phase-1"></a> ## Phase‑1 – Relate pipeline + SNP / freq files
 
-`Convert‑from‑VCF → *.haps + *.sample
-PrepareInputFiles (flipping snps if necessary using ancestor reference alleles, filtering snps, if necessary, using pilot mask allele, removing non-biallelic snps)
-Relate `--mode All` (run‑1, with random N = 30000)
-EstimatePopulationSize → to create the *.coal file (coalescence file that serve as input for .anc and .mut file into next step)
-Relate `--mode All` (run‑2, with --coal flag specified) → final *.anc/*.mut based on coalescence rates
-SNP extraction (cyvcf2 slice of user region)
-Derived‑allele polarization using .mut (that contains information about polarization) + .haps.gz (that contains allele coded as 0 and 1 non polarized) → one ${prefix}_Derived_<rs>.txt per SNP
-Frequency table of the pre-calculated derived alleles →  ${prefix}_Frequency_chrN_start_end.txt
-Intermediate run‑1 files, pairwise .coal and big temporary *.rate files are deleted automatically to save space.
-`
+```
+1 → Convert‑from‑VCF → *.haps + *.sample
+2 → PrepareInputFiles (flipping snps if necessary using ancestor reference alleles, filtering snps, if necessary, using pilot mask allele, removing non-biallelic snps)
+3 → Relate `--mode All` (run‑1, with random N = 30000)
+4 → EstimatePopulationSize → to create the *.coal file (coalescence file that serve as input for .anc and .mut file into next step)
+5 → Relate `--mode All` (run‑2, with --coal flag specified) → final *.anc/*.mut based on coalescence rates
+6 → SNP extraction (cyvcf2 slice of user region)
+7 → Derived‑allele polarization using .mut (that contains information about polarization) + .haps.gz (that contains allele coded as 0 and 1 non polarized) → one ${prefix}_Derived_<rs>.txt per SNP
+8 → Frequency table of the pre-calculated derived alleles →  ${prefix}_Frequency_chrN_start_end.txt
+9 → Intermediate run‑1 files, pairwise .coal and big temporary *.rate files are deleted automatically to save space.
+```
+
 <a name="phase-2"></a> ## Phase‑2 – branch lengths → CLUES inference
 
-SampleBranchLengths (Relate --format n, 200 samples)
-RelateToCLUES.py → <rs>_times.txt
-CLUES v2 (inference.py) with options set by user
-optional arguments:
---CI, --ancientSamps, --ancientHaps, --noAlleleTraj
-Per‑SNP outputs are merged into a TSV; if --CI was requested, the lower / upper bounds are appended.
+```
+1 → SampleBranchLengths (Relate --format n, 200 importance-samples (upper limit to use)
+1 → RelateToCLUES.py → population_<rs>_times.txt
+1 → CLUES v2 (inference.py) with options set by user
+1 → optional arguments:
+1 → --CI, --ancientSamps, --ancientHaps, --noAlleleTraj
+1 → Per‑SNP outputs are merged into a TSV; if --CI was requested, the lower / upper bounds are appended.
+```
 
 <a name="plotting-script"></a> ## Plotting script
 
+example:
 ```
-python plot_CLUES2.py  working-dir/phase2/DOUZ_merged_inference_chr2.tsv \
-       -o DOUZ_chr2_MCM6
+python plot_CLUES2.py  working-dir/phase2/Finnish_merged_inference_chr2.tsv \
+       -o Finnish_chr2_MCM6 (optional --db)
 ```
+the optional flag `--db`, if provided, apply the correction for multiple test
 
-Creates:
+the `plot_CLUES2.py creates:
 
-DOUZ_chr2_MCM6_singleplot_ci.pdf/png – selection coefficient with
-– CI bars,
-– colour = −log<sub>10</sub>(P),
-– asterisks for significance (* < 0.05, ** < 0.01, *** < 0.001)
-– rsID labels.
-All thresholds and colours can be tuned via CLI flags (--p1 0.05 --p2 0.01 …).
-See python plot_CLUES2.py --help.
+`DOUZ_chr2_MCM6_singleplot_ci.pdf/png – selection coefficient with`
+
+where are reported:
+`CI bars(if specified in phase2)`
+`Bar intenisity colour = −log<sub>10</sub>(P)`
+`Asterisks for significance (* < 0.05, ** < 0.01, *** < 0.001)`
+`rsID labels`
+`All thresholds and colours can be tuned via CLI flags (--p1 0.05 --p2 0.01 …)`
+`See python plot_CLUES2.py --help`
 
 <a name="contact"></a> ## Contact
 
