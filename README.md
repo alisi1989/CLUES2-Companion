@@ -75,6 +75,13 @@ cyvcf2
 numpy
 pandas
 matplotlib
+argparse
+re
+os
+```
+To install dependencies simply:
+```
+pip3 install cyvcf2 numpy pandas matplotlib arparse re os
 ```
 
 <a name="inputs"></a> 
@@ -117,7 +124,7 @@ Enter option (1/2): 1
 → Running phase1 … (Relate + SNP extraction + Derived/DAF)
 Chromosome (e.g. 2, 17, X): 2
 Prefix to phased VCF/BCF (without _chrN.vcf.gz): example/Finnish
-Path to population‑labels file (.poplabels): .example/poplabels/Finnish.poplabels
+Path to population‑labels file (.poplabels): example/poplabels/Finnish.poplabels
 Start bp of target region: 135839626
 End   bp of target region: 135876443
 Output base prefix (e.g. Finnish): Finnish
@@ -136,8 +143,8 @@ choose option 2 and answer:
 ‑ accept auto‑detected Frequency & SNP files
 ```
 
-Final table:  working‑dir/phase2/DOUZ_merged_inference_chr2.tsv
-Figure:       working‑dir/phase2/DOUZ_singleplot_ci.pdf
+Final table:  working‑dir/phase2/population_merged_inference_chr2.tsv
+Final Figure:       working‑dir/phase2/population_singleplot_ci.pdf
 
 output dir `working-dir` and subfolder for each phase are automatically created and the outputs land automatically in `working‑dir/phase2/`
 
@@ -155,15 +162,14 @@ output dir `working-dir` and subfolder for each phase are automatically created 
 9 → Intermediate run‑1 files, pairwise .coal and big temporary *.rate files are deleted automatically to save space.
 ```
 
-<a name="phase-2"></a> ## Phase‑2 – branch lengths → CLUES inference
+<a name="phase-2"></a> ## Phase‑2 – branch lengths → CLUES inference → Final merged file for multiple SNPs
 
 ```
-1 → SampleBranchLengths (Relate --format n, 200 importance-samples (upper limit to use)
-1 → RelateToCLUES.py → population_<rs>_times.txt
-1 → CLUES v2 (inference.py) with options set by user
-1 → optional arguments:
-1 → --CI, --ancientSamps, --ancientHaps, --noAlleleTraj
-1 → Per‑SNP outputs are merged into a TSV; if --CI was requested, the lower / upper bounds are appended.
+1 → SampleBranchLengths (Relate --format n, 200 importance-samples (upper limit already used)
+1 → RelateToCLUES.py → workind-dir/phase2/population_<rs>_times.txt
+1 → CLUES2 (inference.py) with options set by user → workind-dir/phase2/population_<rs>_inference.txt
+1 → optional arguments: --CI, --ancientSamps, --ancientHaps, --noAlleleTraj --timeBins
+1 → Per‑SNP outputs are merged into a TSV <workind-dir/phase2/population_merged_inference_chrN.tsv>; if --CI was requested, the lower / upper bounds are appended.
 ```
 
 <a name="plotting-script"></a> ## Plotting script
@@ -171,20 +177,20 @@ output dir `working-dir` and subfolder for each phase are automatically created 
 example:
 ```
 python plot_CLUES2.py  working-dir/phase2/Finnish_merged_inference_chr2.tsv \
-       -o Finnish_chr2_MCM6 (optional --db)
+       -o Finnish_chr2_MCM6 (optional --bh)
 ```
-the optional flag `--db`, if provided, apply the correction for multiple test
+the optional flag `--bh`, if provided, apply the correction for multiple test
 
 the `plot_CLUES2.py creates:
 
 `DOUZ_chr2_MCM6_singleplot_ci.pdf/png – selection coefficient with`
 
 where are reported:
-`CI bars(if specified in phase2)`
-`Bar intenisity colour = −log<sub>10</sub>(P)`
-`Asterisks for significance (* < 0.05, ** < 0.01, *** < 0.001)`
-`rsID labels`
-`All thresholds and colours can be tuned via CLI flags (--p1 0.05 --p2 0.01 …)`
+`CI bars(if specified in phase2)` \ 
+`Bar intenisity colour = −log<sub>10</sub>(P)` \ 
+`Asterisks for significance (* < 0.05, ** < 0.01, *** < 0.001)` \ 
+`rsID labels` \ 
+`All thresholds and colours can be tuned via CLI flags (--p1 0.05 --p2 0.01 …)` \ 
 `See python plot_CLUES2.py --help`
 
 <a name="contact"></a> ## Contact
