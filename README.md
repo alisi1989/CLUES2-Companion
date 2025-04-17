@@ -65,6 +65,7 @@ Bash	GNU parallel (optional)	20240222
 Python	cyvcf2, numpy, pandas, matplotlib	see env.yml
 
 <a name="inputs"></a> ## Input files & folder layout
+```
 CLUES‑Companion/
 ├── Relate/                  ←  Relate executable     (fixed path)
 ├── mandatory/               ←  helper references
@@ -75,6 +76,7 @@ CLUES‑Companion/
 │   ├── POP_chrN.vcf.gz      ←  phased & indexed VCF
 │   └── POP.poplabels        ←  2‑column pop‑label file
 └── clues_pipeline.sh
+```
 
 > VCFs must be phased, gzipped and tabix‑indexed.
 > Chromosomes should be chr1 … chr22 (or 1 … 22) consistently.
