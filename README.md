@@ -83,30 +83,31 @@ CLUES‑Companion/
 > poplabels → two columns: sample ID & population.
 
  <a name="quick-start"></a> ## Quick start (Chromosome 2, gene MCM6)
+
  # Phase‑1   (Relate → .anc/.mut → .coal → SNP extraction …)
 ./clues_pipeline.sh
-# choose option 1 and follow prompts
-#
-#   ‑ chromosome: 2
-#   ‑ VCF prefix:   your_data/Douz
-#   ‑ poplabels:    your_data/Douz.poplabels
-#   ‑ region start / end (bp): 135 800 000 – 135 860 000
-#   ‑ output prefix: DOUZ
-#
-# Outputs land in   working‑dir/phase1/
+choose option 1 and follow prompts
 
-# Phase‑2   (branch lengths → CLUES → merge + plot)
+
+‑ chromosome: 2
+‑ VCF prefix:   your_data/Douz
+‑ poplabels:    your_data/Douz.poplabels
+‑ region start / end (bp): 135 800 000 – 135 860 000
+‑ output prefix: DOUZ
+Outputs land in   working‑dir/phase1/
+
+Phase‑2   (branch lengths → CLUES → merge + plot)
 ./clues_pipeline.sh
-# choose option 2 and answer:
-#
-#   ‑ chromosome: 2
-#   ‑ population prefix: DOUZ
-#   ‑ accept auto‑detected Frequency & SNP files
-#   ‑ Relate prefix: working‑dir/phase1/DOUZ_GS_chr2
-#   ‑ CI: 0.98
-#
-# Final table:  working‑dir/phase2/DOUZ_merged_inference_chr2.tsv
-# Figure:       working‑dir/phase2/DOUZ_singleplot_ci.pdf
+choose option 2 and answer:
+
+‑ chromosome: 2
+‑ population prefix: DOUZ
+‑ accept auto‑detected Frequency & SNP files
+‑ Relate prefix: working‑dir/phase1/DOUZ_GS_chr2
+‑ CI: 0.98
+
+Final table:  working‑dir/phase2/DOUZ_merged_inference_chr2.tsv
+Figure:       working‑dir/phase2/DOUZ_singleplot_ci.pdf
 
 <a name="phase-1"></a> ## Phase‑1 – Relate pipeline + SNP / freq files
 
