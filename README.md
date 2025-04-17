@@ -51,18 +51,31 @@ cd CLUES‑Companion
 chmod +x clues_pipeline.sh                # main driver
 conda env create -f env.yml               # optional: creates py env with cyvcf2 etc.
 ```
+
 Relate must be present as the sub‑folder Relate/ (pre‑compiled binaries work fine).
 If you already have Relate elsewhere, simply symlink it:
 ln -s /path/to/Relate ./Relate.
 
-<a name="dependencies"></a> ## Dependencies
+CLUES2 must be present as the sub‑folder CLUES2/.
+If you already have CLUES2 elsewhere, simply symlink it:
+ln -s /path/to/CLUES2 ./CLUES2.
 
+<a name="dependencies"></a> 
+
+## Dependencies
 
 Type	Tool	Tested version
-Core	Relate	v1.3.3
-      	CLUES v2 (inference.py)	commit bd5d2bc
-Bash	GNU parallel (optional)	20240222
-Python	cyvcf2, numpy, pandas, matplotlib	see env.yml
+Core	Relate	v1.2.2
+CLUES v2 (inference.py)
+Bash	GNU parallel (optional)
+
+```
+Python v12
+cyvcf2
+numpy
+pandas
+matplotlib
+```
 
 <a name="inputs"></a> ## Input files & folder layout
 ```
@@ -79,8 +92,8 @@ CLUES‑Companion/
 ```
 
 - VCFs must be phased, gzipped and tabix‑indexed.
-- Chromosomes should be chr1 … chr22 (or 1 … 22) consistently.
-- poplabels → four columns: sample ID, population, group and SEX. for more information please visit "https://myersgroup.github.io/relate/input_data.html"
+- Chromosomes should be chr1 … chr22 consistently.
+- poplabels → four columns: sample ID `same order of the VCFs`, population, group and SEX. for more information please visit "https://myersgroup.github.io/relate/input_data.html"
 
  <a name="quick-start"></a> 
  
