@@ -77,7 +77,10 @@ pandas
 matplotlib
 ```
 
-<a name="inputs"></a> ## Input files & folder layout
+<a name="inputs"></a> 
+
+## Input files & folder layout
+
 ```
 CLUES‑Companion/
 ├── Relate/                  ←  Relate executable (bin/, script/)
