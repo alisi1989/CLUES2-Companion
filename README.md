@@ -1,7 +1,6 @@
 # CLUES2-Companion
 CLUES‑Companion pipeline
 
-# CLUES‑Companion  
 *A streamlined pipeline for estimating and visualising single‑locus
 selection coefficients with Relate + CLUES v2*
 
