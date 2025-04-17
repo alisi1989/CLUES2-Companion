@@ -22,12 +22,12 @@ Everything is controlled from one Bash script
 `clues_pipeline.sh`; an optional Python helper (`plot_CLUES2.py`)
 creates the final figure.
 
-The code has been tested on macOS 14 and Ubuntu 22 with
-**Relate v1.3.3** and the current master branch of **CLUES v2**.
+The code has been tested on macOS 14, Linux and Ubuntu 22 with
+**Relate v1.2.2** and the current master branch of **CLUES v2 (CLUES2)**.
 
 ---
 
-## Table of Contents
+ ## Table of Contents
 
 - [Installation](#installation)
 - [Dependencies](#dependencies)
@@ -43,7 +43,8 @@ The code has been tested on macOS 14 and Ubuntu 22 with
 ---
 
 <a name="installation"></a>
-## Installation
+
+## Installation
 
 ```bash
 git clone https://github.com/your‑org/CLUES‑Companion.git
@@ -67,27 +68,31 @@ Python	cyvcf2, numpy, pandas, matplotlib	see env.yml
 <a name="inputs"></a> ## Input files & folder layout
 ```
 CLUES‑Companion/
-├── Relate/                  ←  Relate executable     (fixed path)
-├── mandatory/               ←  helper references
+├── Relate/                  ←  Relate executable (bin/, script/)
+├── mandatory/               ←  mandatory files already formatted
 │   ├── ancestor/homo_sapiens_ancestor_chrN.fa
 │   ├── mask/PilotMask_chrN.fasta
 │   └── map/genetic_map_chrN.txt
 ├── your_data/
 │   ├── POP_chrN.vcf.gz      ←  phased & indexed VCF
 │   └── POP.poplabels        ←  4‑column pop‑label file
-└── clues_pipeline.sh
+└── ./CLUES2Companion.sh
 ```
 
-> VCFs must be phased, gzipped and tabix‑indexed.
-> Chromosomes should be chr1 … chr22 (or 1 … 22) consistently.
-> poplabels → four columns: sample ID, population, group and SEX. for more information please visiti "https://myersgroup.github.io/relate/input_data.html"
+- VCFs must be phased, gzipped and tabix‑indexed.
+- Chromosomes should be chr1 … chr22 (or 1 … 22) consistently.
+- poplabels → four columns: sample ID, population, group and SEX. for more information please visit "https://myersgroup.github.io/relate/input_data.html"
 
- <a name="quick-start"></a> ## Quick start (Chromosome 2, example gene MCM6)
+ <a name="quick-start"></a> 
+ 
+ ## Quick start (Chromosome 2, example gene MCM6)
 
  ## Phase‑1   (Relate → .anc/.mut → .coal → SNP extraction …)
 
 example:
 ```
+./CLUES2Companion.sh
+
 ******  CLUES‑Companion – please cite CLUES2 and this helper  ******
 Choose phase to run
   1) Phase‑1  : Relate + SNP/Derived/DAF
@@ -102,16 +107,11 @@ Start bp of target region: 135839626
 End   bp of target region: 135876443
 Output base prefix (e.g. Finnish): Finnish
 ```
-
-‑ chromosome: 2
-‑ VCF prefix:   your_data/Douz
-‑ poplabels:    your_data/Douz.poplabels
-‑ region start / end (bp): 135 800 000 – 135 860 000
-‑ output prefix: DOUZ
-Outputs land in   working‑dir/phase1/
+output dir `working-dir` and subfolder for each phase are automatically created and the outputs land automatically in `working‑dir/phase1/`
 
  ## Phase‑2   (branch lengths → CLUES → merge + plot)
-./clues_pipeline.sh
+```
+./CLUES2Companion.sh
 choose option 2 and answer:
 
 ‑ chromosome: 2
@@ -119,22 +119,25 @@ choose option 2 and answer:
 ‑ accept auto‑detected Frequency & SNP files
 ‑ Relate prefix: working‑dir/phase1/DOUZ_GS_chr2
 ‑ CI: 0.98
+```
 
 Final table:  working‑dir/phase2/DOUZ_merged_inference_chr2.tsv
 Figure:       working‑dir/phase2/DOUZ_singleplot_ci.pdf
 
-<a name="phase-1"></a> ## Phase‑1 – Relate pipeline + SNP / freq files
+output dir `working-dir` and subfolder for each phase are automatically created and the outputs land automatically in `working‑dir/phase2/`
 
-Convert‑from‑VCF → *.haps + *.sample
-PrepareInputFiles (adds ancestor, mask, dist)
-Relate (run‑1, N = 30 000)
-EstimatePopulationSize → *.coal
-Relate (run‑2, with --coal) → final *.anc/*.mut
+<a name="phase-1"></a> ## Phase‑1 – Relate pipeline + SNP / freq files
+
+`Convert‑from‑VCF → *.haps + *.sample
+PrepareInputFiles (flipping snps if necessary using ancestor reference alleles, filtering snps, if necessary, using pilot mask allele, removing non-biallelic snps)
+Relate `--mode All` (run‑1, with random N = 30000)
+EstimatePopulationSize → to create the *.coal file (coalescence file that serve as input for .anc and .mut file into next step)
+Relate `--mode All` (run‑2, with --coal flag specified) → final *.anc/*.mut based on coalescence rates
 SNP extraction (cyvcf2 slice of user region)
-Derived‑allele vectors from .mut + .haps → one ${prefix}_Derived_<rs>.txt per SNP
-Frequency table ${prefix}_Frequency_chrN_start_end.txt
+Derived‑allele polarization using .mut (that contains information about polarization) + .haps.gz (that contains allele coded as 0 and 1 non polarized) → one ${prefix}_Derived_<rs>.txt per SNP
+Frequency table of the pre-calculated derived alleles →  ${prefix}_Frequency_chrN_start_end.txt
 Intermediate run‑1 files, pairwise .coal and big temporary *.rate files are deleted automatically to save space.
-
+`
 <a name="phase-2"></a> ## Phase‑2 – branch lengths → CLUES inference
 
 SampleBranchLengths (Relate --format n, 200 samples)
