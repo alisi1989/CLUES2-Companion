@@ -74,20 +74,34 @@ CLUES‑Companion/
 │   └── map/genetic_map_chrN.txt
 ├── your_data/
 │   ├── POP_chrN.vcf.gz      ←  phased & indexed VCF
-│   └── POP.poplabels        ←  2‑column pop‑label file
+│   └── POP.poplabels        ←  4‑column pop‑label file
 └── clues_pipeline.sh
 ```
 
 > VCFs must be phased, gzipped and tabix‑indexed.
 > Chromosomes should be chr1 … chr22 (or 1 … 22) consistently.
-> poplabels → two columns: sample ID & population.
+> poplabels → four columns: sample ID, population, group and SEX. for more information please visiti "https://myersgroup.github.io/relate/input_data.html"
 
- <a name="quick-start"></a> ## Quick start (Chromosome 2, gene MCM6)
+ <a name="quick-start"></a> ## Quick start (Chromosome 2, example gene MCM6)
 
  ## Phase‑1   (Relate → .anc/.mut → .coal → SNP extraction …)
-./clues_pipeline.sh
-choose option 1 and follow prompts
 
+example:
+```
+******  CLUES‑Companion – please cite CLUES2 and this helper  ******
+Choose phase to run
+  1) Phase‑1  : Relate + SNP/Derived/DAF
+  2) Phase‑2  : BranchLengths → CLUES → merge   (requires Phase‑1 outputs)
+Enter option (1/2): 1
+
+→ Running phase1 … (Relate + SNP extraction + Derived/DAF)
+Chromosome (e.g. 2, 17, X): 2
+Prefix to phased VCF/BCF (without _chrN.vcf.gz): example/Finnish
+Path to population‑labels file (.poplabels): .example/poplabels/Finnish.poplabels
+Start bp of target region: 135839626
+End   bp of target region: 135876443
+Output base prefix (e.g. Finnish): Finnish
+```
 
 ‑ chromosome: 2
 ‑ VCF prefix:   your_data/Douz
