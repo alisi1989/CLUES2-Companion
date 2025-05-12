@@ -73,7 +73,7 @@ required_files/
 
 <a name="dependencies"></a>
 
-Dependencies
+## Dependencies
 
 Bash ≥ 4.0 (for mapfile)
 Python 3.8+
@@ -122,7 +122,7 @@ for more information please refer to: `https://myersgroup.github.io/relate/input
 
 <a name="quick-start"></a>
 
-*Quick start*:
+## Quick start:
 ```
 ./CLUES2Companion.sh
 ```
@@ -132,7 +132,7 @@ Menu prompts: choose 1, 2 or 3.
 
 <a name="phase-1"></a>
 
-**Phase-1 – Relate & SNP preparation**
+## Phase-1 – Relate & SNP preparation
 
 1 - Convert VCF → .haps, .sample \
 2 - PrepareInputFiles (mask, flip, filter) \
@@ -185,7 +185,7 @@ Upon completion of Phase-1, the user will receive an INFO about the number of SN
 
 <a name="phase-2"></a>
 
-## Phase-2 – Selection coefficient inference
+### Phase-2 – Selection coefficient inference
 
 1 - SampleBranchLengths → Newick trees \
 2 - RelateToCLUES.py → *_times.txt \
