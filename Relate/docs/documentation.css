@@ -1,0 +1,256 @@
+body, html {
+  padding-top: 70px;
+}
+
+img {
+  width:100%;
+}
+img.treeplot {
+  width: 75%;
+}
+img.relate{
+  width: 13%;
+  min-width: 100px;
+  max-width: 267px;
+}
+.panel {
+  border: none !important;
+}
+.panel > .panel-heading {
+  background-image: none;
+  background-color: lightblue;
+  color: black;
+  border: none !important;
+}
+.panel, .route-blurb-container {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+a.anchor {
+  display: block;
+  position: relative;
+  top: -70px;
+  visibility: visible;
+}
+
+/**
+* Create an invisible pseudo-element and make it the height of the
+* sticky navbar so the jump takes you to a location above the link
+*/
+:target:before {
+    content: "";
+    display: block;
+    margin-top: -80px;
+    height: 80px;
+    width: 1px;
+}
+
+/* unvisited link */
+a:link {
+    color: blue;
+}
+
+/* visited link */
+a:visited {
+    color: blue;
+}
+
+/* mouse over link */
+a:hover {
+    color: blue;
+}
+
+/* selected link */
+a:active {
+    color: blue;
+}
+
+#left {
+  background-color: white;
+  text-align: left;
+  height:100%;
+}
+
+#right {
+  height:100%;
+  width:100%
+  background-color: white;
+  text-align: left;
+}
+
+@media (min-width: 768px){
+  #left {
+    position: absolute;
+    top: 0px;
+    bottom: 0;
+    left: 0;
+    width: 75%;
+    overflow-y: scroll; 
+  }
+  
+  #right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    overflow-y: scroll;
+    width: 25%;
+  }
+}
+
+
+/* ---------------------------------------------------
+    SIDEBAR STYLE
+----------------------------------------------------- */
+.wrapper {
+    display: flex;
+}
+
+#sidebar {
+    padding-top: 70px;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 30px;
+    height: 100vh;
+    z-index: 999;
+    background: white;
+    color: black;
+    transition: all 0.3s;
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: lightblue;
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+    border-bottom: 1px solid black;
+}
+
+#sidebar ul p {
+    color: white;
+    padding: 10px;
+}
+
+#sidebar ul li a {
+    padding: 10px;
+    font-size: 1.1em;
+    display: block;
+    color: black;
+}
+#sidebar ul li a:hover {
+    color: black;
+    background: lightgrey;
+    text-decoration: none;
+}
+
+#sidebar ul li.active > a, a[aria-expanded="true"] {
+    color: black;
+    background: lightgrey;
+}
+
+
+
+ul ul a {
+    font-size: 0.9em !important;
+    padding-left: 30px !important;
+    background: #6d7fcc;
+}
+
+ul.CTAs {
+    padding: 20px;
+}
+
+ul.CTAs a {
+    text-align: center;
+    font-size: 0.9em !important;
+    display: block;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+/* ---------------------------------------------------
+    CONTENT STYLE
+----------------------------------------------------- */
+#content {
+    width: calc(100% - 200px);
+    padding: 70px;
+    min-height: 100vh;
+    transition: all 0.3s;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+#content.active {
+    width: 100%;
+}
+
+#front_page {
+    width: 100%;
+    padding-top: 50px;
+    transition: all 0.3s;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.table{
+	font-size: 1em !important;
+  max-width: none;
+  width: 100%;    
+  word-wrap: break-word;
+}
+
+pre {
+    overflow-x: auto;
+}
+pre code {
+    overflow-wrap: normal;
+    white-space: pre;
+}
+
+.panel-heading .accordion-toggle:after {
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content: "\e114";    /* adjust as needed, taken from bootstrap.css */
+    float: right;        /* adjust as needed */
+    color: grey;         /* adjust as needed */
+}
+.panel-heading .accordion-toggle.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\e080";    /* adjust as needed, taken from bootstrap.css */
+}
+
+/* ---------------------------------------------------
+    MEDIAQUERIES
+----------------------------------------------------- */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -300px;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+    #content {
+        width: 100%;
+        padding: 0;
+        padding-top: 50px; 
+    }
+    #content.active {
+        width: calc(100% - 250px);
+    }
+    #sidebarCollapse span {
+        display: none;
+    }
+    .table{
+      max-width: 768px;
+      width: 100%;    
+      word-wrap: break-word;
+    }
+}

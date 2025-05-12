@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/cc  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk -dynamiclib -Wl,-headerpad_max_install_names -o /Users/alessandrolisi1989/desktop/Michael_Covid_Polaris/Relate-Clues/relate-master/bin/libkastoreShared.dylib -install_name @rpath/libkastoreShared.dylib CMakeFiles/kastoreShared.dir/kastore.c.o

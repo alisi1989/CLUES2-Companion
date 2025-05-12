@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc /Users/alessandrolisi1989/desktop/Michael_Covid_Polaris/Relate-Clues/relate-master/bin/libgzstreamStatic.a CMakeFiles/gzstreamStatic.dir/gzstream.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib /Users/alessandrolisi1989/desktop/Michael_Covid_Polaris/Relate-Clues/relate-master/bin/libgzstreamStatic.a
