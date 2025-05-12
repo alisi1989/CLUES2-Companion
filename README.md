@@ -248,22 +248,22 @@ TimeBins (a list of epoch breakpoints; optional, ENTER to skip):
 
 ## Explanation of above command lines
 
-The script prompts:
+### The script prompts:
 1 - Select the chromosome:
 Chromosome to process (e.g. 2, 17, X):
 If you ran Phase-1 on several chromosomes, the pipeline automatically looks for the Phase-1 output that matches the chromosome you enter.
 
-2 - Enter the population prefix:
+### 2 - Enter the population prefix:
 Provide the same prefix you used in Phase-1 (e.g. Finnish).
 The script now knows the exact folder structure
 output_C2Companion/phase1/<prefix>_chr<chr>/.
 
-3 - Confirm detected Phase-1 folders:
+### 3 - Confirm detected Phase-1 folders:
 The script shows the paths it has found ( .anc, .mut, .coal, SNP list, frequency table ).
 Press Enter to accept.
 If you manually moved Phase-1 results (not recommended), type the new directory and press Enter.
 
-4 - Mandatory CLUES-2 parameters: (please see CLUES2 and Relate manual, see the links below)
+### 4 - Mandatory CLUES-2 parameters: (please see CLUES2 and Relate manual, see the links below)
 
 | prompt                                    | description                                          | reference              |
 | ----------------------------------------- | ---------------------------------------------------- | ---------------------- |
@@ -273,14 +273,14 @@ If you manually moved Phase-1 results (not recommended), type the new directory 
 
 None of these can be left blank.
 
-5 - Optional files: (please see CLUES2 and Relate manual, see the links below)
+### 5 - Optional files: (please see CLUES2 and Relate manual, see the links below)
 
 AncientSamps — table of sample ages
 AncientHaps — ancient haplotypes
 Press Enter to skip either file.
 (See CLUES-2 README for exact format.)
 
-6 - Optional run-time switches" (please see CLUES2 and Relate manual, see the links below)
+### 6 - Optional run-time switches" (please see CLUES2 and Relate manual, see the links below)
 
 | prompt                                  | effect                                                              |
 | --------------------------------------- | ------------------------------------------------------------------- |
@@ -291,22 +291,22 @@ Press Enter to skip either file.
 Example 200 300 on a tCutoff 500 gives three epochs:
 0-200, 200-300, 300-500.
 
-7 - Internal bookkeeping:
+### 7 - Internal bookkeeping:
 
 NOTE: All output files will be local to `~/Output_C2Companion/phase2/{prefix}_chr{N}/`
 (e.g in this example output are located in `~/Output_C2Companion/phase2/FIN_MCM6_original_chr2/)`
 
-In this output folder the user will find:
+## In this output folder the user will find:
 
-1 - The plot made with:
-```
+### 1 - The plot made with:
+
 All the snps analyzed in Phase-2 
 Bars from CI columns \ 
 Intensity color bar = −log₁₀(p) \ 
 Significance stars based on the p-value above each SNP (* (0.05), ** (0.01), *** (0.01)) 
-```
 
-2 - An Excell chart table file with all the SNPs and the related statistics calculated by CLUES2. 
+
+### 2 - An Excell chart table file with all the SNPs and the related statistics calculated by CLUES2. 
 
 **Example of merged chart table**
 ```
