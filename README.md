@@ -28,8 +28,13 @@ CLUES-Companion pipeline – **v2025-04-16**
   - **Optional bootstrap** with user-defined settings → confidence intervals  
   - **JSON summary** of dating + CI  
 
+Outputs per Phase-1/2/3 → output_C2Companion/phase{1,2,3}/<PREFIX>_chr<CHR>/.
 All phases are driven through a single menu.  Logs are written under `output_C2Companion/log/`.
+In addition, the script relies on *relative paths*.  
+Please keep the following folders exactly where they are.
 
+Moving or renaming **any** of these directories – or this script itself –
+will break Phase1, Phase2 and Phase-3.
 ---
 
 ## Table of Contents
@@ -119,11 +124,7 @@ UNR4 FIN EUR NA
 ```
 for more information please refer to: `https://myersgroup.github.io/relate/input_data.html#Prepare`
 
-In addition, the script relies on *relative paths*.  
-Please keep the following folders exactly where they are.
 
-Moving or renaming **any** of these directories – or this script itself –
-will break Phase1, Phase2 and Phase-3.
 
 
 <a name="quick-start"></a>
@@ -133,10 +134,8 @@ will break Phase1, Phase2 and Phase-3.
 ./CLUES2Companion.sh
 ```
 
-
 Menu prompts: choose 1, 2 or 3.
-Logs → output_C2Companion/log/.
-Outputs per Phase-1/2/3 → output_C2Companion/phase{1,2,3}/<PREFIX>_chr<CHR>/.
+
 
 <a name="phase-1"></a>
 
@@ -151,7 +150,7 @@ Outputs per Phase-1/2/3 → output_C2Companion/phase{1,2,3}/<PREFIX>_chr<CHR>/.
 7 - Polarize derived alleles + compute frequency → ${PREFIX}_Derived_<rs>.txt & ${PREFIX}_Frequency_chr<CHR>_<start>_<end>.txt \
 8 - Cleanup of .rate, .pairwise.*, .annot, intermediate .haps/.sample, run-1 files. \
 
-**Example of usage**
+**Example of usage for Phase-1**
 
 ```
 ./CLUES2Companion.sh
@@ -164,7 +163,7 @@ Enter option (1/2/3):
 ```
 Here the user has to make his choice. There are 3 options available: Phase-1, Phase-2 and Phase-3.
 
-**Example of usage for Phase-1**
+then
 
 ```
 Enter option (1/2/3): 1   
@@ -193,13 +192,121 @@ Upon completion of Phase-1, the user will receive an INFO about the number of SN
 
 <a name="phase-2"></a>
 
-Phase-2 – Selection coefficient inference
+**Phase-2 – Selection coefficient inference**
 
-SampleBranchLengths → Newick trees
-RelateToCLUES.py → *_times.txt
-inference.py (CLUES v2) → _inference.txt (+ *_CI.txt if requested)
-Merge into <PREFIX>_merged_inference_chr<CHR>.tsv
-Python plot:
+1 - SampleBranchLengths → Newick trees
+2 - RelateToCLUES.py → *_times.txt
+3 - inference.py (CLUES v2) → _inference.txt (+ *_CI.txt if requested)
+4 - Merge into <PREFIX>_merged_inference_chr<CHR>.tsv
+5 - Plot 
+
+
+**Example of usage for Phase-2**
+
+```
+******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
+Choose phase to run
+  1) Phase-1  : Relate (*.mut, *.anc, *.coal files) and SNP/Derived/DAF
+  2) Phase-2  : Relate (BranchLengths) → RelateToCLUES.py → inference.py → outputs
+  3) Phase-3  : Dating target SNP(s)
+Enter option (1/2/3): 2
+
+```
+
+then
+
+```
+******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
+Choose phase to run
+  1) Phase-1  : Relate (*.mut, *.anc, *.coal files) and SNP/Derived/DAF
+  2) Phase-2  : Relate (BranchLengths) → RelateToCLUES.py → inference.py → outputs
+  3) Phase-3  : Dating target SNP(s)
+Enter option (1/2/3): 2
+
+
+          ╔═════════════════════════════════════════════════════════╗
+          ║        🧬  PHASE-2 – (requires Phase‑1 outputs)  🧬     ║
+          ║   Please read the manual carefully before proceeding    ║
+          ╚═════════════════════════════════════════════════════════╝
+
+Choose the chromosome to analyze (e.g. 2, 17, X): 2
+Enter population prefix used in Phase‑1 (e.g. Finnish): FIN_MCM6
+Phase‑1 auto-detect directory [ENTER = /Users/alessandrolisi1989/desktop/CLUES2Companion2/output_C2Companion/phase1/FIN_MCM6_chr2] or provide a different folder with phase1 outputs :
+
+→ Using frequency file: /Users/alessandrolisi1989/desktop/CLUES2Companion2/output_C2Companion/phase1/FIN_MCM6_chr2/FIN_MCM6_Frequency_chr2_135839626_135876443.txt
+→ Using SNPs file: /Users/alessandrolisi1989/desktop/CLUES2Companion2/output_C2Companion/phase1/FIN_MCM6_chr2/FIN_MCM6_SNPs_chr2_135839626_135876443.txt
+
+tCutoff (e.g. 1000): 500
+df (e.g. 600): 600
+importance sampling of branch lengths: 200
+AncientSamps file (optional, ENTER to skip): 
+AncientHaps  file (optional, ENTER to skip): 
+Disable allele trajectory? (y/N): y
+Confidence interval (e.g. 0.95) [ENTER to skip]: 0.95
+TimeBins (a list of epoch breakpoints; optional, ENTER to skip):
+```
+
+**Explanation of above command lines**
+
+The script prompts:
+1 - Select the chromosome:
+Chromosome to process (e.g. 2, 17, X):
+If you ran Phase-1 on several chromosomes, the pipeline automatically looks for the Phase-1 output that matches the chromosome you enter.
+
+2 - Enter the population prefix:
+Provide the same prefix you used in Phase-1 (e.g. Finnish).
+The script now knows the exact folder structure
+output_C2Companion/phase1/<prefix>_chr<chr>/.
+
+3 - Confirm detected Phase-1 folders:
+The script shows the paths it has found ( .anc, .mut, .coal, SNP list, frequency table ).
+Press Enter to accept.
+If you manually moved Phase-1 results (not recommended), type the new directory and press Enter.
+
+4 - Mandatory CLUES-2 parameters: (please see CLUES2 and Relate manual, see the links below)
+
+| prompt                                    | description                                          | reference              |
+| ----------------------------------------- | ---------------------------------------------------- | ---------------------- |
+| `tCutoff (e.g. 1000):`                    | analyse selection back to this many generations      | CLUES-2 `--tCutoff`    |
+| `df (e.g. 600):`                          | number of degrees of freedom in the Gaussian process | CLUES-2 `--df`         |
+| `Importance-sampling for branch lengths:` | how many trees to sample from *Relate*               | Relate `--num_samples` |
+
+None of these can be left blank.
+
+5 - Optional files: (please see CLUES2 and Relate manual, see the links below)
+
+AncientSamps — table of sample ages
+AncientHaps — ancient haplotypes
+Press Enter to skip either file.
+(See CLUES-2 README for exact format.)
+
+6 - Optional run-time switches" (please see CLUES2 and Relate manual, see the links below)
+
+| prompt                                  | effect                                                              |
+| --------------------------------------- | ------------------------------------------------------------------- |
+| `Disable allele trajectory? (y/N):`     | answer **y** to *skip* posterior trajectories – speeds up inference |
+| `Confidence interval (0-1, e.g. 0.95):` | compute CI for the selection MLE; **Enter** = no CI                 |
+| `Time-bins (e.g. 200 300):`             | split 0-*tCutoff* into custom intervals; *Enter* = single epoch     |
+
+Example 200 300 on a tCutoff 500 gives three epochs:
+0-200, 200-300, 300-500.
+
+7 - Internal bookkeeping:
+
+NOTE: All output files will be local to ~/Output_C2Companion/phase2/{prefix}_chr{N}/
+(e.g in this example output are located in ~/Output_C2Companion/phase2/FIN_MCM6_original_chr2/)
+
+In this output folder the user will find the plot and the excell file with all the SNPs and the related statistics calculated by CLUES2. 
+in addition to the final outputs, the user will find 3 folders (`{prefix_inference_chr{N}/` `prefix_times_chr{N}/` `prefix_trees_chr{N}`/ in which are stored respectively: the outputs of inference.py for each snp, the *_times.txt files of RelateToClues.py for each snps, and the *.newick files for each snps). 
+
+
+**Further reading**
+
+CLUES-2 options: https://github.com/avaughn271/CLUES2#command-line-arguments
+Relate SampleBranchLengths: https://myersgroup.github.io/relate/modules.html#SampleBranchLengths
+
+
+
 Error bars from CI columns
 Color = −log₁₀(p)
 Significance stars (*, **, ***)
