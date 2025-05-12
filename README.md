@@ -129,7 +129,7 @@ for more information please refer to: `https://myersgroup.github.io/relate/input
 
 <a name="quick-start"></a>
 
-**Quick start**:
+*Quick start*:
 ```
 ./CLUES2Companion.sh
 ```
@@ -150,7 +150,7 @@ Menu prompts: choose 1, 2 or 3.
 7 - Polarize derived alleles + compute frequency → ${PREFIX}_Derived_<rs>.txt & ${PREFIX}_Frequency_chr<CHR>_<start>_<end>.txt \
 8 - Cleanup of .rate, .pairwise.*, .annot, intermediate .haps/.sample, run-1 files. \
 
-**Example of usage for Phase-1**
+## Example of usage for Phase-1
 
 ```
 ./CLUES2Companion.sh
@@ -163,7 +163,7 @@ Enter option (1/2/3):
 ```
 Here the user has to make his choice. There are 3 options available: Phase-1, Phase-2 and Phase-3.
 
-then
+`then`
 
 ```
 Enter option (1/2/3): 1   
@@ -192,16 +192,16 @@ Upon completion of Phase-1, the user will receive an INFO about the number of SN
 
 <a name="phase-2"></a>
 
-**Phase-2 – Selection coefficient inference**
+## Phase-2 – Selection coefficient inference
 
-1 - SampleBranchLengths → Newick trees
-2 - RelateToCLUES.py → *_times.txt
-3 - inference.py (CLUES v2) → _inference.txt (+ *_CI.txt if requested)
-4 - Merge into <PREFIX>_merged_inference_chr<CHR>.tsv
-5 - Plot 
+1 - SampleBranchLengths → Newick trees \
+2 - RelateToCLUES.py → *_times.txt \
+3 - inference.py (CLUES v2) → _inference.txt (+ *_CI.txt if requested) \
+4 - Merge into <PREFIX>_merged_inference_chr<CHR>.tsv \
+5 - Plot \
 
 
-**Example of usage for Phase-2**
+## Example of usage for Phase-2
 
 ```
 ******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
@@ -213,7 +213,7 @@ Enter option (1/2/3): 2
 
 ```
 
-then
+`then`
 
 ```
 ******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
@@ -246,7 +246,7 @@ Confidence interval (e.g. 0.95) [ENTER to skip]: 0.95
 TimeBins (a list of epoch breakpoints; optional, ENTER to skip):
 ```
 
-**Explanation of above command lines**
+## Explanation of above command lines
 
 The script prompts:
 1 - Select the chromosome:
@@ -293,24 +293,44 @@ Example 200 300 on a tCutoff 500 gives three epochs:
 
 7 - Internal bookkeeping:
 
-NOTE: All output files will be local to ~/Output_C2Companion/phase2/{prefix}_chr{N}/
-(e.g in this example output are located in ~/Output_C2Companion/phase2/FIN_MCM6_original_chr2/)
+NOTE: All output files will be local to `~/Output_C2Companion/phase2/{prefix}_chr{N}/`
+(e.g in this example output are located in `~/Output_C2Companion/phase2/FIN_MCM6_original_chr2/)`
 
-In this output folder the user will find the plot and the excell file with all the SNPs and the related statistics calculated by CLUES2. 
-in addition to the final outputs, the user will find 3 folders (`{prefix_inference_chr{N}/` `prefix_times_chr{N}/` `prefix_trees_chr{N}`/ in which are stored respectively: the outputs of inference.py for each snp, the *_times.txt files of RelateToClues.py for each snps, and the *.newick files for each snps). 
+In this output folder the user will find:
 
+1 - The plot made with:
+`
+<img width="795" alt="Screenshot 2025-05-12 at 2 32 20 PM" src="https://github.com/user-attachments/assets/9ca62171-ac72-444c-b79d-9cb7b185d8e3" />
+or bars from CI columns \ 
+Color = −log₁₀(p) \ 
+Significance stars based on the p-value (* (0.05), ** (0.01), *** (0.01)) \ 
+Outputs: *_singleplot_ci.pdf 
+`
+
+2 - An Excell chart table file with all the SNPs and the related statistics calculated by CLUES2. 
+
+
+**Example of merged chart table**
+```
+rsID	POS	der_freq	logLR	-log10(p)	Epoch1_start	Epoch1_end	SelectionMLE1	95%_lower	95%_upper
+rs55809728	135842606	0.0909	3.5508	2.11	0	536	0.09981	0.05336	0.14626
+rs3754686	135845706	0.6515	5.3420	2.97	0	536	0.02312	0.00405	0.04218
+rs4988243	135850133	0.1263	2.0500	1.37	0	536	0.09984	-0.01286	0.21254
+rs4954490	135850661	0.6515	5.5070	3.04	0	536	0.02308	0.00369	0.04247
+rs4988235	135851076	0.5909	17.2338	8.36	0	536	0.09986	0.08678	0.11294
+rs4954493	135852405	0.6515	5.7506	3.16	0	536	0.02420	0.00069	0.04772
+rs4988226	135853028	0.6515	5.3420	2.97	0	536	0.02312	0.00405	0.04218
+rs309178	135854054	0.6515	5.5244	3.05	0	536	0.02288	0.00368	0.04208
+rs309179	135856210	0.6515	5.4909	3.04	0	536	0.02248	0.00139	0.04356
+```
+[INFO] In addition to the final outputs, the user will find 3 folders (`{prefix_inference_chr{N}/` `prefix_times_chr{N}/` `prefix_trees_chr{N}`/ in which are stored respectively: the outputs of inference.py for each snp, the *_times.txt files of RelateToClues.py for each snps, and the *.newick files for each snps). 
 
 **Further reading**
 
-CLUES-2 options: https://github.com/avaughn271/CLUES2#command-line-arguments
-Relate SampleBranchLengths: https://myersgroup.github.io/relate/modules.html#SampleBranchLengths
+CLUES-2 manual: https://github.com/avaughn271/CLUES2#command-line-arguments \
+Relate SampleBranchLengths: https://myersgroup.github.io/relate/modules.html#SampleBranchLengths \
 
 
-
-Error bars from CI columns
-Color = −log₁₀(p)
-Significance stars (*, **, ***)
-Outputs: *_singleplot_ci.pdf & .png
 
 <a name="phase-3"></a>
 
