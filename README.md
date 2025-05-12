@@ -137,25 +137,24 @@ Quick start
 
 Menu prompts: choose 1, 2 or 3.
 Logs → output_C2Companion/log/.
-Outputs per phase → output_C2Companion/phase{1,2,3}/<PREFIX>_chr<CHR>/.
+Outputs per Phase-1/2/3 → output_C2Companion/phase{1,2,3}/<PREFIX>_chr<CHR>/.
 
 <a name="phase-1"></a>
 
 Phase-1 – Relate & SNP preparation
 
-1 - Convert VCF → .haps, .sample
-2 - PrepareInputFiles (mask, flip, filter)
-3 - Relate mode All (run-1 → random Ne) → .anc, .mut
-4 - EstimatePopulationSize → .coal
-5 - Relate mode All (run-2 with --coal) → final .anc, .mut
-6 - Extract SNPs via cyvcf2 within user region
-7 - Polarize derived alleles + compute frequency → ${PREFIX}_Derived_<rs>.txt & ${PREFIX}_Frequency_chr<CHR>_<start>_<end>.txt
-8 - Cleanup of .rate, .pairwise.*, .annot, intermediate .haps/.sample, run-1 files.
+1 - Convert VCF → .haps, .sample \
+2 - PrepareInputFiles (mask, flip, filter) \
+3 - Relate mode All (run-1 → random Ne) → .anc, .mut \
+4 - EstimatePopulationSize → .coal \
+5 - Relate mode All (run-2 with --coal) → final .anc, .mut \
+6 - Extract SNPs via cyvcf2 within user region \
+7 - Polarize derived alleles + compute frequency → ${PREFIX}_Derived_<rs>.txt & ${PREFIX}_Frequency_chr<CHR>_<start>_<end>.txt \
+8 - Cleanup of .rate, .pairwise.*, .annot, intermediate .haps/.sample, run-1 files. \
 
 #Example of usage#
 
 ```
-./
 ./CLUES2Companion.sh
 ******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
 Choose phase to run
