@@ -104,19 +104,18 @@ CLUES-Companion/
     ├ POP_chrN.vcf.gz          # phased & indexed VCF
     └ POP.poplabels            # sampleID, population, group, SEX
 ```
-The user must use a fully phased vcf accompaand the index file (*.tbi). 
-The vcf file must contain only one population and one chromosome.
+The user must use a fully phased vcf and the index file (*.tbi). 
+The vcf file must contain only one population and one chromosome (e.g see example/FIN_chr2.vcf.gz and example/FIN_chr2.vcf.gz.tbi)
 
 The *.poplabels file must contain 4 columns (sampleID, population, group, SEX). 
 
+e.g. for Diploid organisms:
 ```
-e.g. :
-Diploid organisms:
 sample population group sex
-UNR1 PJB SAS NA
-UNR2 JPT EAS NA
-UNR3 GBR EUR NA
-UNR4 YRI AFR NA
+UNR1 FIN EUR NA
+UNR2 FIN EUR NA
+UNR3 FIN EUR NA
+UNR4 FIN EUR NA
 ```
 for more information please refer to: `https://myersgroup.github.io/relate/input_data.html#Prepare`
 
@@ -129,7 +128,7 @@ will break Phase1, Phase2 and Phase-3.
 
 <a name="quick-start"></a>
 
-Quick start
+**Quick start**:
 ```
 ./CLUES2Companion.sh
 ```
@@ -141,7 +140,7 @@ Outputs per Phase-1/2/3 → output_C2Companion/phase{1,2,3}/<PREFIX>_chr<CHR>/.
 
 <a name="phase-1"></a>
 
-Phase-1 – Relate & SNP preparation
+**Phase-1 – Relate & SNP preparation**
 
 1 - Convert VCF → .haps, .sample \
 2 - PrepareInputFiles (mask, flip, filter) \
@@ -152,7 +151,7 @@ Phase-1 – Relate & SNP preparation
 7 - Polarize derived alleles + compute frequency → ${PREFIX}_Derived_<rs>.txt & ${PREFIX}_Frequency_chr<CHR>_<start>_<end>.txt \
 8 - Cleanup of .rate, .pairwise.*, .annot, intermediate .haps/.sample, run-1 files. \
 
-#Example of usage#
+**Example of usage**
 
 ```
 ./CLUES2Companion.sh
@@ -165,7 +164,7 @@ Enter option (1/2/3):
 ```
 Here the user has to make his choice. There are 3 options available: Phase-1, Phase-2 and Phase-3.
 
-#Example of usage for Phase-1#
+**Example of usage for Phase-1**
 
 ```
 Enter option (1/2/3): 1   
