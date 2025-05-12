@@ -124,8 +124,7 @@ UNR4 FIN EUR NA
 ```
 for more information please refer to: `https://myersgroup.github.io/relate/input_data.html#Prepare`
 
-
-
+---
 
 <a name="quick-start"></a>
 
@@ -200,6 +199,7 @@ Upon completion of Phase-1, the user will receive an INFO about the number of SN
 4 - Merge into <PREFIX>_merged_inference_chr<CHR>.tsv \
 5 - Plot \
 
+---
 
 ## Example of usage for Phase-2
 
@@ -299,16 +299,14 @@ NOTE: All output files will be local to `~/Output_C2Companion/phase2/{prefix}_ch
 In this output folder the user will find:
 
 1 - The plot made with:
-`
-<img width="795" alt="Screenshot 2025-05-12 at 2 32 20 PM" src="https://github.com/user-attachments/assets/9ca62171-ac72-444c-b79d-9cb7b185d8e3" />
-or bars from CI columns \ 
-Color = −log₁₀(p) \ 
-Significance stars based on the p-value (* (0.05), ** (0.01), *** (0.01)) \ 
-Outputs: *_singleplot_ci.pdf 
-`
+```
+All the snps analyzed in Phase-2 
+Bars from CI columns \ 
+Intensity color bar = −log₁₀(p) \ 
+Significance stars based on the p-value above each SNP (* (0.05), ** (0.01), *** (0.01)) 
+```
 
 2 - An Excell chart table file with all the SNPs and the related statistics calculated by CLUES2. 
-
 
 **Example of merged chart table**
 ```
@@ -330,7 +328,7 @@ rs309179	135856210	0.6515	5.4909	3.04	0	536	0.02248	0.00139	0.04356
 CLUES-2 manual: https://github.com/avaughn271/CLUES2#command-line-arguments \
 Relate SampleBranchLengths: https://myersgroup.github.io/relate/modules.html#SampleBranchLengths \
 
-
+---
 
 <a name="phase-3"></a>
 
