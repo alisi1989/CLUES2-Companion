@@ -1,199 +1,184 @@
-# CLUES2-Companion
-CLUES‑Companion pipeline
+# CLUES2-Companion  
+CLUES-Companion pipeline – **v2025-04-16**
 
-*A streamlined pipeline for estimating and visualising single‑locus
-selection coefficients with Relate + CLUES v2*
+*A streamlined pipeline for estimating, visualizing, and dating selection coefficients using Relate and CLUES v2 for multiple SNPs*
 
 ---
 
 **Overview**
 
-**CLUES‑Companion** is a two‑phase command‑line workflow that
+**CLUES2Companion.sh** is a comprehensive three-phase Bash pipeline that now includes:
 
-1. runs **Relate** to build local genealogies and sample branch lengths  
-2. feeds those branch lengths to **CLUES v2** to infer the selection
-   coefficient (*s*) for every SNP in a user‑defined region  
-3. merges the per‑SNP results into a single table and generates
-   publication‑ready plots (selection coefficient ± CI,
-   colour = −log<sub>10</sub> *p*, asterisks for significance, etc.).
+- **Phase-1**:  
+  - Convert VCF → `.haps` & `.sample`  
+  - Prepare input (masking, flipping, filtering)  
+  - Run Relate (two passes → `.anc`, `.mut`, `.coal`)  
+  - Extract SNPs & polarize derived alleles → per-SNP files & frequency table  
+  - **Automatic cleanup** of intermediate files  
 
-Everything is controlled from one Bash script
-`clues_pipeline.sh`; an optional Python helper (`plot_CLUES2.py`)
-creates the final figure.
+- **Phase-2**:  
+  - Sample branch lengths → Newick trees  
+  - Run **RelateToCLUES.py** → per-SNP `*_times.txt`  
+  - Run **CLUES v2** (`inference.py`) → per-SNP `_inference.txt` (+ optional `_CI.txt`)  
+  - **Merge** all SNP inferences → combined TSV  
+  - **Integrated plotting** in Python (error bars, −log₁₀(p), significance stars)  
 
-The code has been tested on macOS 14, Linux and Ubuntu 22 with
-**Relate v1.2.2** and the current master branch of **CLUES v2 (CLUES2)**.
+- **Phase-3**:  
+  - **Sliding-window dating** of a target rsID → initial onset estimate (generations & years)  
+  - **Optional bootstrap** with user-defined settings → confidence intervals  
+  - **JSON summary** of dating + CI  
+
+All phases are driven through a single menu.  Logs are written under `output_C2Companion/log/`.
 
 ---
 
- ## Table of Contents
+## Table of Contents
 
-- [Installation](#installation)
-- [Dependencies](#dependencies)
-- [Input files & folder layout](#inputs)
-- [Quick start](#quick-start)
-- [Phase‑1 (details)](#phase-1)
-- [Phase‑2 (details)](#phase-2)
-- [Plotting script](#plotting-script)
-- [Tips & troubleshooting](#tips)
-- [License](#license)
-- [Contact](#contact)
+- [Installation](#installation)  
+- [Dependencies](#dependencies)  
+- [Input files & folder layout](#inputs)  
+- [Quick start](#quick-start)  
+- [Phase-1 (details)](#phase-1)  
+- [Phase-2 (details)](#phase-2)  
+- [Phase-3 (details)](#phase-3)  
+- [Tips & troubleshooting](#tips)  
+- [License](#license)  
+- [Contact](#contact)  
 
 ---
 
 <a name="installation"></a>
-
 ## Installation
 
 ```bash
-git clone https://github.com/your‑org/CLUES‑Companion.git
-cd CLUES‑Companion
-chmod +x clues_pipeline.sh                # main driver
-conda env create -f env.yml               # optional: creates py env with cyvcf2 etc.
+git clone https://github.com/your-org/CLUES-Companion.git
+cd CLUES-Companion
+chmod +x CLUES2Companion.sh
 ```
-
-Relate must be present as the sub‑folder Relate/ (pre‑compiled binaries work fine).
-If you already have Relate elsewhere, simply symlink it:
-ln -s /path/to/Relate ./Relate.
-
-CLUES2 must be present as the sub‑folder CLUES2/.
-If you already have CLUES2 elsewhere, simply symlink it:
-ln -s /path/to/CLUES2 ./CLUES2.
-
-<a name="dependencies"></a> 
-
-## Dependencies
-
-Type	Tool	Tested version
-Core	Relate	v1.2.2
-CLUES v2 (inference.py)
-Bash	GNU parallel (optional)
+Ensure your working dir contains sub-folders:
 
 ```
-Python v12
-cyvcf2
-numpy
-pandas
-matplotlib
-argparse
-re
-os
-```
-To install dependencies simply:
-```
-pip3 install cyvcf2 numpy pandas matplotlib arparse re os
+Relate/     ← Relate binaries  
+CLUES2/     ← CLUES v2 scripts  
+required_files/  
+  ├ ancestor/homo_sapiens_ancestor_chrN.fa  
+  ├ mask/PilotMask_chrN.fasta  
+  └ map/genetic_map_chrN.txt  
 ```
 
-<a name="inputs"></a> 
-
-## Input files & folder layout
-
+To symlink existing installations:
 ```
-CLUES‑Companion/
-├── Relate/                  ←  Relate executable (bin/, script/)
-├── mandatory/               ←  mandatory files already formatted
-│   ├── ancestor/homo_sapiens_ancestor_chrN.fa
-│   ├── mask/PilotMask_chrN.fasta
-│   └── map/genetic_map_chrN.txt
-├── your_data/
-│   ├── POP_chrN.vcf.gz      ←  phased & indexed VCF
-│   └── POP.poplabels        ←  4‑column pop‑label file
-└── ./CLUES2Companion.sh
+ln -s /path/to/Relate   ./Relate
+ln -s /path/to/CLUES2   ./CLUES2
 ```
 
-- VCFs must be phased, gzipped and tabix‑indexed.
-- Chromosomes should be chr1 … chr22 consistently.
-- poplabels → four columns: sample ID `same order of the VCFs`, population, group and SEX. for more information please visit "https://myersgroup.github.io/relate/input_data.html"
+<a name="dependencies"></a>
 
- <a name="quick-start"></a> 
- 
- ## Quick start (Chromosome 2, example gene MCM6)
+Dependencies
 
- ## Phase‑1   (Relate → .anc/.mut → .coal → SNP extraction …)
+Bash ≥ 4.0 (for mapfile)
+Python 3.8+
+Relate v1.2.2
+CLUES v2 (master branch)
+GNU parallel (optional)
+Python packages:
 
-example:
+```
+pip3 install cyvcf2 numpy pandas matplotlib adjustText
+```
+
+<a name="inputs"></a>
+
+Input files & folder layout
+
+```
+CLUES-Companion/
+├── CLUES2Companion.sh         # main driver
+├── Relate/                    # Relate bin/, scripts/
+├── CLUES2/                    # CLUES v2 scripts
+├── required_files/            # reference data
+│   ├ ancestor/…
+│   ├ mask/…
+│   └ map/…
+└── your_data/
+    ├ POP_chrN.vcf.gz          # phased & indexed VCF
+    └ POP.poplabels            # sampleID, population, group, SEX
+```
+
+<a name="quick-start"></a>
+
+Quick start
 ```
 ./CLUES2Companion.sh
-
-******  CLUES‑Companion – please cite CLUES2 and this helper  ******
-Choose phase to run
-  1) Phase‑1  : Relate + SNP/Derived/DAF
-  2) Phase‑2  : BranchLengths → CLUES → merge   (requires Phase‑1 outputs)
-Enter option (1/2): 1
-
-→ Running phase1 … (Relate + SNP extraction + Derived/DAF)
-Chromosome (e.g. 2, 17, X): 2
-Prefix to phased VCF/BCF (without _chrN.vcf.gz): example/Finnish
-Path to population‑labels file (.poplabels): example/poplabels/Finnish.poplabels
-Start bp of target region: 135839626
-End   bp of target region: 135876443
-Output base prefix (e.g. Finnish): Finnish
-```
-output dir `working-dir` and subfolder for each phase are automatically created and the outputs land automatically in `working‑dir/phase1/`
-
- ## Phase‑2   (branch lengths → CLUES → merge + plot)
- 
- example:
-```
-./CLUES2Companion.sh
-choose option 2 and answer:
-
-‑ chromosome: 2
-‑ population prefix: Finnish
-‑ accept auto‑detected Frequency & SNP files
 ```
 
-Final table:  working‑dir/phase2/population_merged_inference_chr2.tsv
-Final Figure:       working‑dir/phase2/population_singleplot_ci.pdf
 
-output dir `working-dir` and subfolder for each phase are automatically created and the outputs land automatically in `working‑dir/phase2/`
+Menu prompts: choose 1, 2 or 3.
+Logs → output_C2Companion/log/.
+Outputs per phase → output_C2Companion/phase{1,2,3}/<PREFIX>_chr<CHR>/.
 
-<a name="phase-1"></a> ## Phase‑1 – Relate pipeline + SNP / freq files
+<a name="phase-1"></a>
 
-```
-1 → Convert‑from‑VCF → *.haps + *.sample
-2 → PrepareInputFiles (flipping snps if necessary using ancestor reference alleles, filtering snps, if necessary, using pilot mask allele, removing non-biallelic snps)
-3 → Relate `--mode All` (run‑1, with random N = 30000)
-4 → EstimatePopulationSize → to create the *.coal file (coalescence file that serve as input for .anc and .mut file into next step)
-5 → Relate `--mode All` (run‑2, with --coal flag specified) → final *.anc/*.mut based on coalescence rates
-6 → SNP extraction (cyvcf2 slice of user region)
-7 → Derived‑allele polarization using .mut (that contains information about polarization) + .haps.gz (that contains allele coded as 0 and 1 non polarized) → one ${prefix}_Derived_<rs>.txt per SNP
-8 → Frequency table of the pre-calculated derived alleles →  ${prefix}_Frequency_chrN_start_end.txt
-9 → Intermediate run‑1 files, pairwise .coal and big temporary *.rate files are deleted automatically to save space.
-```
+Phase-1 – Relate & SNP preparation
 
-<a name="phase-2"></a> ## Phase‑2 – branch lengths → CLUES inference → Final merged file for multiple SNPs
+Convert VCF → .haps, .sample
+PrepareInputFiles (mask, flip, filter)
+Relate mode All (run-1 → random Ne) → .anc, .mut
+EstimatePopulationSize → .coal
+Relate mode All (run-2 with --coal) → final .anc, .mut
+Extract SNPs via cyvcf2 within user region
+Polarize derived alleles + compute frequency →
+${PREFIX}_Derived_<rs>.txt
+${PREFIX}_Frequency_chr<CHR>_<start>_<end>.txt
+Cleanup of .rate, .pairwise.*, .annot, intermediate .haps/.sample, run-1 files.
 
-```
-1 → SampleBranchLengths (Relate --format n, 200 importance-samples (upper limit already used)
-1 → RelateToCLUES.py → workind-dir/phase2/population_<rs>_times.txt
-1 → CLUES2 (inference.py) with options set by user → workind-dir/phase2/population_<rs>_inference.txt
-1 → optional arguments: --CI, --ancientSamps, --ancientHaps, --noAlleleTraj --timeBins
-1 → Per‑SNP outputs are merged into a TSV <workind-dir/phase2/population_merged_inference_chrN.tsv>; if --CI was requested, the lower / upper bounds are appended.
-```
+<a name="phase-2"></a>
 
-<a name="plotting-script"></a> ## Plotting script
+Phase-2 – Selection coefficient inference
 
-example:
-```
-python plot_CLUES2.py  working-dir/phase2/Finnish_merged_inference_chr2.tsv \
-       -o Finnish_chr2_MCM6 (optional --bh)
-```
-the optional flag `--bh`, if provided, apply the correction for multiple test
+SampleBranchLengths → Newick trees
+RelateToCLUES.py → *_times.txt
+inference.py (CLUES v2) → _inference.txt (+ *_CI.txt if requested)
+Merge into <PREFIX>_merged_inference_chr<CHR>.tsv
+Python plot:
+Error bars from CI columns
+Color = −log₁₀(p)
+Significance stars (*, **, ***)
+Outputs: *_singleplot_ci.pdf & .png
 
-the `plot_CLUES2.py creates:
+<a name="phase-3"></a>
 
-`DOUZ_chr2_MCM6_singleplot_ci.pdf/png – selection coefficient with`
+Phase-3 – Dating selective sweeps
 
-where are reported:
-`CI bars(if specified in phase2)` \ 
-`Bar intenisity colour = −log<sub>10</sub>(P)` \ 
-`Asterisks for significance (* < 0.05, ** < 0.01, *** < 0.001)` \ 
-`rsID labels` \ 
-`All thresholds and colours can be tuned via CLI flags (--p1 0.05 --p2 0.01 …)` \ 
-`See python plot_CLUES2.py --help`
+Initial scan over fixed windows (0–2000 gen) → onset estimate
+Save initial JSON:
 
-<a name="contact"></a> ## Contact
+`{ "rsID": "...", "onset_gen": 100, "onset_years": 2800, … }`
 
-Alessandro Lisi  alisi@usc.edu   (alisi1989)
-Michael C. Campbell  mc44680@usc.edu   (mc44680)
+
+Optional bootstrap: user-defined epochs, window size, replicates
+Compute per-replicate onsets → summary statistics (median, 95% CI)
+Save JSON with CI:
+rsID_Boostraps_onset_Dating+CI.json
+
+<a name="tips"></a>
+
+Tips & troubleshooting
+
+Logging: check output_C2Companion/log/ for debug
+Missing deps: verify RelateFileFormats, PrepareInputFiles.sh, Python packages
+Spinner issues: ensure bash -euo pipefail is supported
+Plot errors: install adjustText for label adjustment
+Bootstrap: skip by answering “N” when prompted
+<a name="license"></a>
+
+License
+
+MIT License
+
+<a name="contact"></a>
+
+Contact
+
+Alessandro Lisi alisi@usc.edu (alisi1989)
+Michael C. Campbell mc44680@usc.edu (mc44680)
