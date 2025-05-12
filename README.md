@@ -56,7 +56,7 @@ will break Phase1, Phase2 and Phase-3.
 ## Installation
 
 ```bash
-git clone https://github.com/your-org/CLUES-Companion.git
+git clone https://github.com/alisi1989/CLUES2-Companion.git
 cd CLUES-Companion
 chmod +x CLUES2Companion.sh
 ```
@@ -69,12 +69,6 @@ required_files/
   ├ ancestor/homo_sapiens_ancestor_chrN.fa  
   ├ mask/PilotMask_chrN.fasta  
   └ map/genetic_map_chrN.txt  
-```
-
-To symlink existing installations:
-```
-ln -s /path/to/Relate   ./Relate
-ln -s /path/to/CLUES2   ./CLUES2
 ```
 
 <a name="dependencies"></a>
@@ -296,7 +290,7 @@ Example 200 300 on a tCutoff 500 gives three epochs:
 NOTE: All output files will be local to `~/Output_C2Companion/phase2/{prefix}_chr{N}/`
 (e.g in this example output are located in `~/Output_C2Companion/phase2/FIN_MCM6_original_chr2/)`
 
-## In this output folder the user will find:
+### In this output folder the user will find:
 
 ### 1 - The plot made with:
 
