@@ -198,7 +198,7 @@ All SNPs between these positions are extracted from the fully phased vcf.
 | `Prefix of output name:`                | e.g. `example/Finnish` **Important: You must use the exact same prefix in Phase 2 and Phase 3** |
 
 
-**What you will see on the screen:**
+## What you will see on the screen:
 
 Every major step prints an INFO line that indicates where the resulting files are saved (e.g., output_C2Companion/phase1/)
 
