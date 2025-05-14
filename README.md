@@ -70,11 +70,11 @@ required_files/
 
 ## Dependencies
 
-Bash ≥ 4.0 (for mapfile)
-Python 3.8+
-Relate v1.2.2
-CLUES2 (master branch)
-GNU parallel (optional)
+Bash ≥ 4.0 (for mapfile) \
+Python 3.8+ \
+Relate v1.2.2 \
+CLUES2 (master branch) \
+GNU parallel (optional) \
 Python packages: numpy, pandas, matplotlib, adjustText
 
 ```
