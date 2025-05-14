@@ -85,10 +85,10 @@ pip3 install cyvcf2 numpy pandas matplotlib adjustText
 
 <a name="inputs"></a>
 
-Input files & folder layout
+Input file & folder layout tree
 
 ```
-CLUES-Companion/
+CLUES2 Companion/
 ├── CLUES2Companion.sh         # main driver
 ├── Relate/                    # Relate bin/, scripts/
 ├── CLUES2/                    # CLUES v2 scripts
@@ -96,16 +96,17 @@ CLUES-Companion/
 │   ├ ancestor/…
 │   ├ mask/…
 │   └ map/…
-└── your_data/
-    ├ POP_chrN.vcf.gz          # phased & indexed VCF
-    └ POP.poplabels            # sampleID, population, group, SEX
+└── example/
+    ├ Finnish_chr2.vcf.gz      # phased and indexed vcf
+    └ Finnish.poplabels        # sampleID, population, group, SEX
 ```
-The user must use a fully phased vcf and the index file (*.tbi). 
-The vcf file must contain only one population and one chromosome (e.g see example/FIN_chr2.vcf.gz and example/FIN_chr2.vcf.gz.tbi)
+Users must use fully phased vcf and indexed files (e.g., *.vcf.gz and *.tbi files). 
 
-The *.poplabels file must contain 4 columns (sampleID, population, group, SEX). 
+Furthermore, the vcf file must contain only one population and one chromosome (e.g., example/Finnish_chr2.vcf.gz)
 
-e.g. for Diploid organisms:
+In addition, the *.poplabels file must contain four columns (namely, sampleID, population, group, SEX)
+
+Example of *.poplabels file for diploid organisms:
 ```
 sample population group sex
 UNR1 FIN EUR NA
@@ -113,7 +114,7 @@ UNR2 FIN EUR NA
 UNR3 FIN EUR NA
 UNR4 FIN EUR NA
 ```
-for more information please refer to: `https://myersgroup.github.io/relate/input_data.html#Prepare`
+For more information please refer to: `https://myersgroup.github.io/relate/input_data.html#Prepare`
 
 ---
 
@@ -124,34 +125,33 @@ for more information please refer to: `https://myersgroup.github.io/relate/input
 ./CLUES2Companion.sh
 ```
 
-Menu prompts: choose 1, 2 or 3.
+Menu prompts: choose Phase 1, Phase 2 or Phase 3.
 
 
 <a name="phase-1"></a>
 
-## Phase-1 – Relate & SNP preparation
+## Phase 1 – Run Relate to create input files for CLUES2 
 
-1 - Convert VCF → .haps, .sample \
-2 - PrepareInputFiles (mask, flip, filter) \
-3 - Relate mode All (run-1 → random Ne) → .anc, .mut \
-4 - EstimatePopulationSize → .coal \
-5 - Relate mode All (run-2 with --coal) → final .anc, .mut \
-6 - Extract SNPs via cyvcf2 within user region \
-7 - Polarize derived alleles + compute frequency → ${PREFIX}_Derived_<rs>.txt & ${PREFIX}_Frequency_chr<CHR>_<start>_<end>.txt \
-8 - Cleanup of .rate, .pairwise.*, .annot, intermediate .haps/.sample, run-1 files. \
+1 - Convert vcf to `*.haps`, `*.sample` \
+2 - Apply PrepareInputFiles.sh in Relate (to mask, flip, and filter SNPs) \
+3 - Run Relate mode All (with a user-specified Ne to generate the `*.anc` and `*.mut` files \
+4 - Apply EstimatePopulationSize.sh to generate the `*.coal` file \
+5 - Re-estimate branch lengths using the `*.coal` to generated updated `*.anc` and `*.mut` files \
+6 - Use the cyvcf2 package to extract, SNPs and corresponding positions within a user-specified target region \
+7 - Polarize derived alleles and compute derived allele frequency \
 
-## Example of usage for Phase-1
+## Example of usage of Phase 1
 
 ```
 ./CLUES2Companion.sh
-******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
+******  CLUES2 Companion – please cite CLUES2 and CLUES2Companion  ******
 Choose phase to run
-  1) Phase-1  : Relate (*.mut, *.anc, *.coal files) and SNP/Derived/DAF
-  2) Phase-2  : Relate (BranchLengths) → RelateToCLUES.py → inference.py → outputs
-  3) Phase-3  : Dating target SNP(s)
+  1) Phase 1  : Apply Relate (*.mut, *.anc, *.coal files along with derived allele frequency) 
+  2) Phase 2  : Apply Relate (BranchLengths) and CLUES2 (RelateToCLUES.py and inference.py) 
+  3) Phase 3  : Date onset of selective sweeps of target SNP(s)
 Enter option (1/2/3):
 ```
-Here the user has to make his choice. There are 3 options available: Phase-1, Phase-2 and Phase-3.
+Here, users have to make their choice. That is to say, they will have to enter either 1, 2, or 3.
 
 `then`
 
@@ -165,45 +165,44 @@ Enter option (1/2/3): 1
           ╚═════════════════════════════════════════════════════════╝
 
 Choose the chromosome to analyze (e.g. 2, 17, X): 2
-Prefix of phased vcf/bcf file (e.g. example/FIN without _chrN.vcf.gz): example/FIN
-Path to population‑labels file (*.poplabels)(e.g. example/FIN.poplabels): example/FIN.poplabels
+Prefix of phased vcf/bcf file (e.g. example/Finnish without _chrN.vcf.gz): example/Finnish
+Path to population‑labels file (*.poplabels)(e.g. example/Finnish.poplabels): example/Finnish.poplabels
 Start bp of target region: 135839626
 End bp of target region: 135876443
-Prefix of output name (e.g. Finnish): FIN_MCM6
+Prefix of output name (e.g. Finnish): Finnish_MCM6
 ```
-### Explanation of Phase-1: required inputs & on-screen feedback
+### Explanation of Phase 1: required inputs and on-screen feedback
 
 `1 - Select the input data:`
 
-| prompt                                                          | what to type                   |
+| Prompt                                                          | What to type                   |
 | --------------------------------------------------------------- | ------------------------------ |
-| `Chromosome to analyse (e.g. 2, 17, X):`                        | the chromosome number / letter |
-| `Prefix of phased VCF/BCF (without _chrN and without .vcf.gz):` | e.g. `example/Finnish`         |
+| `Chromosome to analyze (e.g. 2, 17, X):`                        | chromosome number (e.g., 2)    |
+| `Prefix of phased vcf/bcf (Finnish without _chrN.vcf.gz):`      | e.g. `example/Finnish`         |
 
 
 `2 - Define the target region"`
 
-| prompt                       | description                                       |
+| Prompt                       | Description                                       |
 | ---------------------------- | ------------------------------------------------- |
-| `Start bp of target region:` | left coordinate of the window you want to analyse |
-| `End bp of target region:`   | right coordinate of the window                    |
+| `Start bp of target region:` | genomic start coordinate of the window to analyse |
+| `End bp of target region:`   | genomic end coordinate of the window to analyse   |
 
 
-All SNPs between these positions are extracted from the fully phased VCF.
+All SNPs between these positions are extracted from the fully phased vcf.
 
 `3 - Choose an output prefix:`
 
-| prompt                                  | description                                                                                     |
+| Prompt                                  | Description                                                                                     |
 | --------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `Prefix of output name (e.g. Finnish):` | a short tag for this population/run. **Keep it— you will reuse the same prefix in Phases 2-3.** |
+| `Prefix of output name:`                | e.g. `example/Finnish` **Important: You must use the exact same prefix in Phase 2 and Phase 3** |
 
 
-**What you’ll see on screen**
+**What you will see on the screen:**
 
-Every major step prints an INFO line that shows where the resulting files are written inside
-output_C2Companion/phase1/.
-While a step is running, a progress bar moves across the terminal.
-If something fails you get a [WARN] or [ERROR] line; otherwise the step ends with the word `done!`.
+Every major step prints an INFO line that indicates where the resulting files are saved (e.g., output_C2Companion/phase1/)
+
+While a step is running, a progress bar will move across the terminal. If something fails, you get a [WARN] or [ERROR] message; otherwise the step ends with the word `done!`.
 
 
 <a name="phase-2"></a>
