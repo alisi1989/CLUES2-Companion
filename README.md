@@ -34,32 +34,32 @@ will interfere with the functioning of Phase 1, Phase 2 and Phase 3 algorithms.
 
 ## Table of Contents
 
-- [Installation](#installation)  
+- [Installation](#Installation)  
 - [Dependencies](#dependencies)  
 - [Input files & folder layout](#inputs)  
 - [Quick start](#quick-start)  
-- [Phase-1 (details)](#phase-1)  
-- [Phase-2 (details)](#phase-2)  
-- [Phase-3 (details)](#phase-3)  
+- [Phase 1 (details)](#Phase 1)  
+- [Phase 2 (details)](#Phase 2)  
+- [Phase 3 (details)](#Phase 3)  
 - [Tips & troubleshooting](#tips)  
 - [License](#license)  
 - [Contact](#contact)  
 
 ---
 
-<a name="installation"></a>
+<a name="Installation"></a>
 ## Installation
 
 ```bash
-git clone https://github.com/alisi1989/CLUES2-Companion.git
-cd CLUES-Companion
+git clone https://github.com/alisi1989/CLUES2_Companion.git
+cd CLUES2_Companion
 chmod +x CLUES2Companion.sh
 ```
-Ensure your working dir contains sub-folders:
+Ensure your working dir contains the following sub-folders:
 
 ```
-Relate/     ← Relate binaries  
-CLUES2/     ← CLUES v2 scripts  
+Relate/     contains Relate binary files  
+CLUES2/     contains CLUES2 scripts  
 required_files/  
   ├ ancestor/homo_sapiens_ancestor_chrN.fa  
   ├ mask/PilotMask_chrN.fasta  
@@ -73,11 +73,13 @@ required_files/
 Bash ≥ 4.0 (for mapfile)
 Python 3.8+
 Relate v1.2.2
-CLUES v2 (master branch)
+CLUES2 (master branch)
 GNU parallel (optional)
-Python packages:
+Python packages: numpy, pandas, matplotlib, adjustText
 
 ```
+Example of installation of Python packages
+
 pip3 install cyvcf2 numpy pandas matplotlib adjustText
 ```
 
