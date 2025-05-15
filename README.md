@@ -169,7 +169,7 @@ Prefix of phased vcf/bcf file (e.g. example/Finnish without _chrN.vcf.gz): examp
 Path to population‑labels file (*.poplabels)(e.g. example/Finnish.poplabels): example/Finnish.poplabels
 Start bp of target region: 135839626
 End bp of target region: 135876443
-Prefix of output name (e.g. Finnish): Finnish_MCM6
+Prefix of output name (e.g. Finnish): Finnish
 ```
 ### Explanation of Phase 1: required inputs and on-screen feedback
 
@@ -213,18 +213,18 @@ While a step is running, a progress bar will move across the terminal. If someth
 2 - Apply RelateToCLUES.py (CLUES2) to generate *_times.txt \
 3 - Apply inference.py (CLUES2) to estimate selection coefficients and confidence intervals \
 4 - Merge summary statistics, rsID, genomic coordinates, and derived allele frequency into *.tsv file \
-5 - Tabular and graphical outputs \
+5 - Generate tabular and graphical outputs \
 
 ---
 
-### Example of usage for Phase-2
+### Example of usage for Phase 2
 
 ```
 ******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
 Choose phase to run
-  1) Phase-1  : Relate (*.mut, *.anc, *.coal files) and SNP/Derived/DAF
-  2) Phase-2  : Relate (BranchLengths) → RelateToCLUES.py → inference.py → outputs
-  3) Phase-3  : Dating target SNP(s)
+  1) Phase 1  : Apply Relate (*.mut, *.anc, *.coal files along with derived allele frequency) 
+  2) Phase 2  : Apply Relate (BranchLengths) and CLUES2 (RelateToCLUES.py and inference.py) 
+  3) Phase 3  : Date onset of selective sweeps of target SNP(s)
 Enter option (1/2/3): 2
 
 ```
@@ -232,25 +232,17 @@ Enter option (1/2/3): 2
 `then`
 
 ```
-******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
-Choose phase to run
-  1) Phase-1  : Relate (*.mut, *.anc, *.coal files) and SNP/Derived/DAF
-  2) Phase-2  : Relate (BranchLengths) → RelateToCLUES.py → inference.py → outputs
-  3) Phase-3  : Dating target SNP(s)
-Enter option (1/2/3): 2
-
-
           ╔═════════════════════════════════════════════════════════╗
           ║        🧬  PHASE-2 – (requires Phase‑1 outputs)  🧬     ║
           ║   Please read the manual carefully before proceeding    ║
           ╚═════════════════════════════════════════════════════════╝
 
 Choose the chromosome to analyze (e.g. 2, 17, X): 2
-Enter population prefix used in Phase‑1 (e.g. Finnish): FIN_MCM6
-Phase‑1 auto-detect directory [ENTER = /Users/alessandrolisi1989/desktop/CLUES2Companion2/output_C2Companion/phase1/FIN_MCM6_chr2] or provide a different folder with phase1 outputs :
+Enter population prefix used in Phase‑1 (e.g., Finnish_MCM6): Finnish
+Phase 1 auto-detect directory [ENTER = /~/CLUES2Companion2/output_C2Companion/phase1/Finnish_MCM6_chr2] or provide a different folder with phase1 outputs :
 
-→ Using frequency file: /Users/alessandrolisi1989/desktop/CLUES2Companion2/output_C2Companion/phase1/FIN_MCM6_chr2/FIN_MCM6_Frequency_chr2_135839626_135876443.txt
-→ Using SNPs file: /Users/alessandrolisi1989/desktop/CLUES2Companion2/output_C2Companion/phase1/FIN_MCM6_chr2/FIN_MCM6_SNPs_chr2_135839626_135876443.txt
+→ Using frequency file: ~/CLUES2Companion2/output_C2Companion/phase1/FIN_MCM6_chr2/Finnish_MCM6_Frequency_chr2_135839626_135876443.txt
+→ Using SNPs file: ~/CLUES2Companion2/output_C2Companion/phase1/FIN_MCM6_chr2/Finnish_MCM6_SNPs_chr2_135839626_135876443.txt
 
 tCutoff (e.g. 1000): 500
 df (e.g. 600): 600
@@ -264,53 +256,51 @@ TimeBins (a list of epoch breakpoints; optional, ENTER to skip):
 
 ## Explanation of above command lines
 
-### The script prompts:
-1 - Select the chromosome:
-Chromosome to process (e.g. 2, 17, X):
-If you ran Phase-1 on several chromosomes, the pipeline automatically looks for the Phase-1 output that matches the chromosome you enter.
+### Script prompts:
+Select the chromosome to analyze:
+**Chromosome to analyze (e.g., 2, 17, X):**
+If you run Phase 1 on several chromosomes, the pipeline automatically searches for the Phase 1 output that matches the chromosome that you enter above.
 
-### 2 - Enter the population prefix:
-Provide the same prefix you used in Phase-1 (e.g. Finnish).
-The script now knows the exact folder structure
-output_C2Companion/phase1/<prefix>_chr<chr>/.
+**Enter the population prefix:**
+Provide the same prefix you used in Phase 1 (e.g. Finnish). The Phase 2 script now knows the exact folder structure (e.g., output_C2Companion/phase1/Finnish_chr2/).
 
-### 3 - Confirm detected Phase-1 folders:
-The script shows the paths it has found ( .anc, .mut, .coal, SNP list, frequency table ).
-Press Enter to accept.
-If you manually moved Phase-1 results (not recommended), type the new directory and press Enter.
+**Confirm detected Phase 1 folders:**
+The script shows the path to the location of the following file: *.anc, *.mut, *.coal, SNP list (`*.txt`), and frequency table (`*.txt`).
+If the path is correct, press Enter to accept.
+If users have manually moved Phase 1 folder (which is not recommended), type the path to the location of the new directory and press Enter.
 
-### 4 - Mandatory CLUES-2 parameters: (please see CLUES2 and Relate manual, see the links below)
+### Mandatory CLUES2 parameters (please see CLUES2 and Relate manuals):
 
-| prompt                                    | description                                          | reference              |
+| Prompt                                    | Description                                          | Reference              |
 | ----------------------------------------- | ---------------------------------------------------- | ---------------------- |
-| `tCutoff (e.g. 1000):`                    | analyse selection back to this many generations      | CLUES-2 `--tCutoff`    |
-| `df (e.g. 600):`                          | number of degrees of freedom in the Gaussian process | CLUES-2 `--df`         |
-| `Importance-sampling for branch lengths:` | how many trees to sample from *Relate*               | Relate `--num_samples` |
+| `tCutoff (e.g. 1000):`                    | The maximum time (in generations)                    | CLUES2 `--tCutoff`    |
+| `df (e.g. 600):`                          | number of allele frequency bins                      | CLUES2 `--df`         |
+| `Importance sampling of branch lengths:`  | number of trees to sample from *Relate*              | Relate `--num_samples` |
 
-None of these can be left blank.
+None of the above prompts can be left blank.
 
-### 5 - Optional files: (please see CLUES2 and Relate manual, see the links below)
+### Optional files (please see CLUES2 and Relate manuals):
 
-AncientSamps — table of sample ages
-AncientHaps — ancient haplotypes
-Press Enter to skip either file.
-(See CLUES-2 README for exact format.)
+`AncientSamps — table of sample ages`
+`AncientHaps — ancient haplotypes`
+`Press Enter to skip either file`
 
-### 6 - Optional run-time switches" (please see CLUES2 and Relate manual, see the links below)
+Please see the CLUES2 manual for examples of formatting
+
+### Optional parameters to include (please see CLUES2 and Relate manuals):
 
 | prompt                                  | effect                                                              |
 | --------------------------------------- | ------------------------------------------------------------------- |
-| `Disable allele trajectory? (y/N):`     | answer **y** to *skip* posterior trajectories – speeds up inference |
-| `Confidence interval (0-1, e.g. 0.95):` | compute CI for the selection MLE; **Enter** = no CI                 |
-| `Time-bins (e.g. 200 300):`             | split 0-*tCutoff* into custom intervals; *Enter* = single epoch     |
+| `Disable allele trajectory? (y/N):`     | answer **y** to *skip* posterior trajectories speeds up inference   |
+| `Confidence intervals (e.g. 0.95):`     | compute CI for the selection coefficient (MLE); **Enter** = no CI   |
+| `TimeBins (e.g., 200 300):`             | split 0-*tCutoff* into custom intervals; *Enter* = single epoch     |
 
-Example 200 300 on a tCutoff 500 gives three epochs:
-0-200, 200-300, 300-500.
 
-### 7 - Internal bookkeeping:
+The example TimeBins 200 300 for a tCutoff 500 yields three epochs: 0-200, 200-300, 300-500.
 
-NOTE: All output files will be local to `~/Output_C2Companion/phase2/{prefix}_chr{N}/`
-(e.g in this example output are located in `~/Output_C2Companion/phase2/FIN_MCM6_original_chr2/)`
+### Internal housekeeping:
+
+NOTE: All output files will be saved to `~/Output_C2Companion/phase2/{prefix}_chr{N}/`. In this example output files are saved in `~/Output_C2Companion/phase2/FIN_MCM6_original_chr2/)`
 
 ### In this output folder the user will find:
 
@@ -320,6 +310,10 @@ All the snps analyzed in Phase-2
 Bars from CI columns \ 
 Intensity color bar = −log₁₀(p) \ 
 Significance stars based on the p-value above each SNP (* (0.05), ** (0.01), *** (0.01)) 
+
+
+
+ (please refer to CLUES2 and Relate manuals, see the links below)
 
 
 ### 2 - An Excell chart table file with all the SNPs and the related statistics calculated by CLUES2. 
