@@ -211,9 +211,9 @@ While a step is running, a progress bar will move across the terminal. If someth
 
 1 - Apply SampleBranchLengths.sh (Relate) to sample ancestral recombination graphs (ARGs) to generate Newick trees \
 2 - Apply RelateToCLUES.py (CLUES2) to generate *_times.txt \
-3 - Apply inference.py (CLUES2) to estimate selection coefficients and confidence intervals 
-4 - Merge into <PREFIX>_merged_inference_chr<CHR>.tsv \
-5 - Plot \
+3 - Apply inference.py (CLUES2) to estimate selection coefficients and confidence intervals \
+4 - Merge summary statistics, rsID, genomic coordinates, and derived allele frequency into *.tsv file \
+5 - Tabular and graphical outputs \
 
 ---
 
