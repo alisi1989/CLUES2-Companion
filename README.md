@@ -302,23 +302,17 @@ The example TimeBins 200 300 for a tCutoff 500 yields three epochs: 0-200, 200-3
 
 NOTE: All output files will be saved to `~/Output_C2Companion/phase2/{prefix}_chr{N}/`. In this example output files are saved in `~/Output_C2Companion/phase2/FIN_MCM6_original_chr2/)`
 
-### In this output folder the user will find:
+### The resulting plot will contain:
 
-### 1 - The plot made with:
-
-All the snps analyzed in Phase-2 
-Bars from CI columns \ 
-Intensity color bar = −log₁₀(p) \ 
-Significance stars based on the p-value above each SNP (* (0.05), ** (0.01), *** (0.01)) 
+SNPs analyzed in Phase 2 \
+Confidence intervals \ 
+Color intensity bar `[−log₁₀(p)]` \ 
+Astericks indicating significance above each SNP (* (0.05), ** (0.01), *** (0.001)) 
 
 
+### A *.tsv file containing SNP information, including related statistics calculated by CLUES2. 
 
- (please refer to CLUES2 and Relate manuals, see the links below)
-
-
-### 2 - An Excell chart table file with all the SNPs and the related statistics calculated by CLUES2. 
-
-**Example of merged chart table**
+**Example of `*.tsv file`**
 ```
 rsID	POS	der_freq	logLR	-log10(p)	Epoch1_start	Epoch1_end	SelectionMLE1	95%_lower	95%_upper
 rs55809728	135842606	0.0909	3.5508	2.11	0	536	0.09981	0.05336	0.14626
@@ -331,11 +325,12 @@ rs4988226	135853028	0.6515	5.3420	2.97	0	536	0.02312	0.00405	0.04218
 rs309178	135854054	0.6515	5.5244	3.05	0	536	0.02288	0.00368	0.04208
 rs309179	135856210	0.6515	5.4909	3.04	0	536	0.02248	0.00139	0.04356
 ```
-[INFO] In addition to the final outputs, the user will find 3 folders (`{prefix_inference_chr{N}/` `prefix_times_chr{N}/` `prefix_trees_chr{N}`/ in which are stored respectively: the outputs of inference.py for each snp, the *_times.txt files of RelateToClues.py for each snps, and the *.newick files for each snps). 
+[INFO] In addition to the final outputs, users will find three additional folders (`{prefix_inference_chr{N}/`, `prefix_times_chr{N}/`, `prefix_trees_chr{N}/` in which the output from inference.py, RelateToClues.py, and Relate are stored, respectively)
 
-**Further reading**
+**FuAdditional reading**
 
-CLUES-2 manual: https://github.com/avaughn271/CLUES2#command-line-arguments \
+CLUES2 manual: https://github.com/avaughn271/CLUES2#command-line-arguments \
+
 Relate SampleBranchLengths: https://myersgroup.github.io/relate/modules.html#SampleBranchLengths \
 
 ---
