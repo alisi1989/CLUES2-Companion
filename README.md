@@ -341,9 +341,9 @@ Relate SampleBranchLengths: https://myersgroup.github.io/relate/modules.html#Sam
 ## Phase 3 – Dating selective sweeps
 
 1 - Apply inference.py (CLUES2) to estimate selection coefficients and confidence intervals in indipendt multi-epochs bin \
-2 - Generate Initial onset and writing result into a *.json file
-3 - (optional) Generate bootstraps to estimate confidence interval around first initial onset
-4 - Writing results into a *.json file with summary statistics
+2 - Generate Initial onset and writing result into a *.json file \
+3 - (optional) Generate bootstraps to estimate confidence interval around first initial onset \
+4 - Writing results into a *.json file with summary statistics \
 
 The dating algorithm is based on inferring a selection coefficient in multiple epochs starting from the present and going back into the past. A selection coefficient is computed independently in each window. The assumption for dating is the observation of a selection coefficient that starts deviating from zero (s > 0) and maintains this trend for at least for four younger window. If the first criterion is not satisfied, the script searches for three consecutive windows in which s remains > 0. If there are not even 3 consecutive windows the script searches for 2 consecutive windows but will generate a warning message.
 
