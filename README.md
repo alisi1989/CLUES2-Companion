@@ -38,9 +38,9 @@ will interfere with the functioning of Phase 1, Phase 2 and Phase 3 algorithms.
 - [Dependencies](#dependencies)  
 - [Input files & folder layout](#inputs)  
 - [Quick start](#quick-start)  
-- [Phase 1 (details)](#Phase 1)  
-- [Phase 2 (details)](#Phase 2)  
-- [Phase 3 (details)](#Phase 3)  
+- [Phase 1 (details)](#Phase1)  
+- [Phase 2 (details)](#Phase2)  
+- [Phase 3 (details)](#Phase3)  
 - [Tips & troubleshooting](#tips)  
 - [License](#license)  
 - [Contact](#contact)  
@@ -128,7 +128,7 @@ For more information please refer to: `https://myersgroup.github.io/relate/input
 Menu prompts: choose Phase 1, Phase 2 or Phase 3.
 
 
-<a name="Phase 1"></a>
+<a name="Phase1"></a>
 
 ## Phase 1 – Run Relate to create input files for CLUES2 
 
@@ -205,7 +205,7 @@ Every major step prints an INFO line that indicates where the resulting files ar
 While a step is running, a progress bar will move across the terminal. If something fails, you get a [WARN] or [ERROR] message; otherwise the step ends with the word `done!`.
 
 
-<a name="Phase 2"></a>
+<a name="Phase2"></a>
 
 ## Phase-2 – Selection coefficient inference
 
@@ -335,24 +335,22 @@ Relate SampleBranchLengths: https://myersgroup.github.io/relate/modules.html#Sam
 
 ---
 
-<a name="Phase 3"></a>
+<a name="Phase3"></a>
 
-Phase-3 – Dating selective sweeps
 
-## Phase-2 – Selection coefficient inference
+## Phase 3 – Dating selective sweeps
 
 1 - Apply inference.py (CLUES2) to estimate selection coefficients and confidence intervals in indipendt multi-epochs bin \
 2 - Generate Initial onset and writing result into a *.json file
 3 - (optional) Generate bootstraps to estimate confidence interval around first initial onset
 4 - Writing results into a *.json file with summary statistics
 
----
-
-### Example of usage for Phase 3
-
 The dating algorithm is based on inferring a selection coefficient in multiple epochs starting from the present and going back into the past. A selection coefficient is computed independently in each window. The assumption for dating is the observation of a selection coefficient that starts deviating from zero (s > 0) and maintains this trend for at least for four younger window. If the first criterion is not satisfied, the script searches for three consecutive windows in which s remains > 0. If there are not even 3 consecutive windows the script searches for 2 consecutive windows but will generate a warning message.
 
-### Esample of usage
+
+---
+
+### Esample of usage for Phase 3
 
 ```
 ******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
