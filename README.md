@@ -497,11 +497,11 @@ Replicates   : 100
 
 For the boostrap replicates, users must provide a start and end time around the estimated onset of selection. As shown in the examples above, the onset based on the first dating was 300 generations ago. Hence, the time tange 0 - 500 generations ago was selected, and within this range we estimated the selection coefficient for a window size of 25 generations ago.  
 
-To calculate confidence intervals, we will perform Phase 1, Phase 2, and Phase 3 (generating *.newick, *_times.txt, *.coal files among others for each SNP) with a random seed n number of times depending on the number of replicates defined by the user. In the end, CLUES2 COMpanion will generate a distribution of onset selection. will performed using Relate sample brench lengths, new *.newick files for each replica, then RelateToClues.py will be applied to generate a *_times.txt file for each *.newick file replicated and inference.py (CLUES2) will estimate a selection coefficient in each epoch for each replicates. 
-Random seeds (--seed $RANDOM) are always used to generate always different coalescence-based genealogies.
+To calculate confidence intervals, we will perform Phase 1, Phase 2, and Phase 3 (generating *.newick, *_times.txt, *.coal files among others for each SNP) with a random seed n number of times depending on the number of replicates defined by the user. Please note that users will be prompted to provide parameters for each replicate. In the end, CLUES2 Companion will generate a distribution of selection onsets from which lower and upper bounds of time in generations, representing the confidence intervals will be determined by the user. 
 
 ```
-e.g.,
+For example, if users selected 100 replicates,
+
 ▶  Generating 100 bootstrap trees & CLUES runs
 → [bootstrap 1]  SampleBranchLengths (seed=973675772)
 →   RelateToCLUES
@@ -525,13 +525,10 @@ e.g.,
 →     CLUES inference • window [475 - 500]
 ```
 
-Moreover, the user must decide the number of boostraps, considering the computational times it involves (e.g., 100 bootraps can take from 16 to 32 hours per SNP).
 
-In addition to this, the user must also decide, for the SampleBrenchLenghts.sh step (Relate) the number of trees to sample (importance sampling). For the `df` score and the `importance sampling`, we suggest the user to use the same parameters used in phase2 and phase3.
+Users must also decide the number of trees to sample (importance sampling using the SampleBrenchLenghts.sh script in Relate). For the `df` score and the `importance sampling`, we recommend that users apply the same parameters that were used in Phase 2 and Phase 3.
 
-For the boostraps replicate, the user has to provide again the initial and final epochs to scan. We recommend, in order to save computational time, to use a start and end of the epochs to scan not too far from the first onset. As shown in these examples above, the onset based on the first dating was 300 generations ago. Therefore, epochs for the bootraps 0 - 500 were selected, and to have a more fine distribution, a window size of 25 generations was set. 
-
-At the end of the bootstraps phase, the onset inferred by CLUES2 for each bootraps replication is printed to the terminal. these values ​​are used to calculate the summary statistics alongside the *.json.
+At the end of the bootstrap phase, the onset inferred by CLUES2 for each bootraps replication is printed to the terminal. These values ​​are used to calculate the summary statistics along with the *.json.
 
 ```
 e.g, on *.json:
