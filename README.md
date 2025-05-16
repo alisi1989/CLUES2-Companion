@@ -128,7 +128,7 @@ For more information please refer to: `https://myersgroup.github.io/relate/input
 Menu prompts: choose Phase 1, Phase 2 or Phase 3.
 
 
-<a name="phase-1"></a>
+<a name="Phase 1"></a>
 
 ## Phase 1 – Run Relate to create input files for CLUES2 
 
@@ -205,7 +205,7 @@ Every major step prints an INFO line that indicates where the resulting files ar
 While a step is running, a progress bar will move across the terminal. If something fails, you get a [WARN] or [ERROR] message; otherwise the step ends with the word `done!`.
 
 
-<a name="phase-2"></a>
+<a name="Phase 2"></a>
 
 ## Phase-2 – Selection coefficient inference
 
@@ -335,30 +335,221 @@ Relate SampleBranchLengths: https://myersgroup.github.io/relate/modules.html#Sam
 
 ---
 
-<a name="phase-3"></a>
+<a name="Phase 3"></a>
 
 Phase-3 – Dating selective sweeps
 
-Initial scan over fixed windows (0–2000 gen) → onset estimate
-Save initial JSON:
+## Phase-2 – Selection coefficient inference
 
-`{ "rsID": "...", "onset_gen": 100, "onset_years": 2800, … }`
+1 - Apply inference.py (CLUES2) to estimate selection coefficients and confidence intervals in indipendt multi-epochs bin \
+2 - Generate Initial onset and writing result into a *.json file
+3 - (optional) Generate bootstraps to estimate confidence interval around first initial onset
+4 - Writing results into a *.json file with summary statistics
 
+---
 
-Optional bootstrap: user-defined epochs, window size, replicates
-Compute per-replicate onsets → summary statistics (median, 95% CI)
-Save JSON with CI:
-rsID_Boostraps_onset_Dating+CI.json
+### Example of usage for Phase 3
 
-<a name="tips"></a>
+The dating algorithm is based on inferring a selection coefficient in multiple epochs starting from the present and going back into the past. A selection coefficient is computed independently in each window. The assumption for dating is the observation of a selection coefficient that starts deviating from zero (s > 0) and maintains this trend for at least for four younger window. If the first criterion is not satisfied, the script searches for three consecutive windows in which s remains > 0. If there are not even 3 consecutive windows the script searches for 2 consecutive windows but will generate a warning message.
 
-Tips & troubleshooting
+### Esample of usage
 
-Logging: check output_C2Companion/log/ for debug
-Missing deps: verify RelateFileFormats, PrepareInputFiles.sh, Python packages
-Spinner issues: ensure bash -euo pipefail is supported
-Plot errors: install adjustText for label adjustment
-Bootstrap: skip by answering “N” when prompted
+```
+******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
+Choose phase to run
+  1) Phase 1  : Apply Relate (*.mut, *.anc, *.coal files along with derived allele frequency) 
+  2) Phase 2  : Apply Relate (BranchLengths) and CLUES2 (RelateToCLUES.py and inference.py) 
+  3) Phase 3  : Date onset of selective sweeps of target SNP(s)
+Enter option (1/2/3): 3
+
+```
+
+`then`
+
+```
+          ╔═════════════════════════════════════════════════════════╗
+          ║        ⏱️  PHASE-3 – Dating a selective sweep  ⏱️         ║
+          ║   Please read the manual carefully before proceeding    ║
+          ╚═════════════════════════════════════════════════════════╝
+
+Choose chromosome to analyze (e.g. 2, 17, X): 2
+Same prefix population name as used in Phase-2 (e.g. Finnish): Finnish 
+rsID of SNP to date   (e.g. rs123): rs49988235
+df score for CLUES2 (e.g. 600): 600
+Initial epoch to scan for initial onset (e.g. 0 or 50): 0
+Final epoch to scan for initial onset (e.g. 500 or 1000): 1000
+Non overlapping windows size  [default is 50]: 50
+```
+
+## Explanation of above command lines
+
+### Script prompts:
+Select the chromosome to analyze:
+**Chromosome to analyze (e.g., 2, 17, X):**
+If you run Phase 1 and Phase 2 on several chromosomes, the pipeline automatically searches for the Phase 1 and Phase 2 outputs that matches the chromosome that you enter above.
+
+**Enter the population prefix:**
+Provide the same prefix you used in Phase 1 and Phase 2 (e.g. Finnish). Must exactly match the Phase‑1/2 prefix; case‑sensitive. The Phase 3 script now knows the exact folder structure (e.g., output_C2Companion/phase1/Finnish_chr2/).
+
+**Enter the variant identificator (rs) to date:**
+Provide the `rs` variant to date (e.g. rs4988235). Only one variant per run. The ID must be present in the phased VCF fed to Phase‑1.
+
+**Enter the df score (e.g, 600):**
+Provide the `df` (--df in CLUES2) score (number of allele frequency bins). we suggest to use the same value employed in Phase‑2 for comparability.
+
+**Enter the initial epoch to scn for the initial onset:**
+Provide the `first` epoch to scan (e.g, 0 or 50)
+
+**Enter the final epoch to scn for the initial onset:**
+Provide the `final` epoch to scan (e.g, 500 or 1000). Make sure Final ≥ putative sweep age. When unknown, 0–1000 is a safe default (≈ 0–28 kya). Otherwise a final epoch of 2000 covers most possible scenarios
+
+**Enter the non overlapping windows size:**
+Provide a value representing the window size of two consecutive epochs (e.g, 25 or 50). Ff, as in the example, a starting epoch of 0 and a final (--tcutoff) of 500 and a windows size of 50 are provided, the script will automatically create: 0-50, 50-100, 100-150, 150-200 ..... 450-500 epochs to scan to estimate the selection coefficient in each window indipendentely. Smaller windows means higher computational time cost but less noisy  estimates.
+
+```
+e.g, :
+Break-points : 0
+50
+100
+150
+200
+250
+300
+350
+400
+450
+500
+550
+600
+650
+700
+750
+800
+850
+900
+950
+1000
+Window size  : 50
+```
+
+when the first dating is complete, a message with the summary results will be printed to the terminal alongside a *.json file with the first dating results:
+
+```
+e.g., on terminal:
+Initial onset ≈ 300 generations (≈ 8400 years)
+epoch : 300 – 350
+s(MLE) : 0.02187
+```
+```
+e.g, on *.json:
+{
+  "rsID": "rs4988235",
+  "population": "FIN_MCM63",
+  "chromosome": "2",
+  "onset_gen": 300,
+  "onset_years": 8400,
+  "epoch_start": 300,
+  "epoch_end": 350,
+  "epoch_start_years": 8400,
+  "epoch_end_years": 9800,
+  "s_MLE": 0.02187
+}
+```
+
+`After the point estimate the script asks if the users want to proceed with the boostraps:`
+
+```
+Proceed with bootstrap dating? [y/N]: y
+```
+`If the users type "y":`
+
+```
+▶  Bootstrap settings
+Epochs to scan before initial onset (e.g. 200): 50
+Epochs to scan after initial onset (e.g. 500): 500
+Non overlapping windows size  [default is 25]: 25
+Number of bootstrap replicates  [default is 100]: 100
+df score for CLUES2  [default is 450]: 600
+Importance sampling of branch lengths: 200
+
+Break-points : 50
+75
+100
+125
+150
+175
+200
+225
+250
+275
+300
+325
+350
+375
+400
+425
+450
+475
+500
+tCutoff      : 525
+Replicates   : 100
+```
+**[INFO]**: Runtime note.  100 bootstraps with default parameters typically require 16–32 CPU‑hours per SNP.
+
+For the boostraps replicate, the user has to provide again the initial and final epochs to scan. We recommend, in order to save computational time, to use a start and end of the epochs to scan not too far from the first onset. As shown in these examples above, the onset based on the first dating was 300 generations ago. Therefore, epochs for the bootraps 0 - 500 were selected, and to have a more fine distribution, a window size of 25 generations was set. 
+
+The bootraps phase, will create using Relate sample brench lengths, new *.newick files for each replica, then RelateToClues.py will be applied to generate a *_times.txt file for each *.newick file replicated and inference.py (CLUES2) will estimate a selection coefficient in each epoch for each replicates. 
+Random seeds (--seed $RANDOM) are always used to generate always different coalescence-based genealogies.
+
+```
+e.g.,
+▶  Generating 100 bootstrap trees & CLUES runs
+→ [bootstrap 1]  SampleBranchLengths (seed=973675772)
+→   RelateToCLUES
+→     CLUES inference • window [50 - 75]
+→     CLUES inference • window [75 - 100]
+→     CLUES inference • window [100 - 125]
+→     CLUES inference • window [125 - 150]
+→     CLUES inference • window [150 - 175]
+→     CLUES inference • window [175 - 200]
+→     CLUES inference • window [200 - 225]
+→     CLUES inference • window [225 - 250]
+→     CLUES inference • window [250 - 275]
+→     CLUES inference • window [275 - 300]
+→     CLUES inference • window [300 - 325]
+→     CLUES inference • window [325 - 350]
+→     CLUES inference • window [350 - 375]
+→     CLUES inference • window [375 - 400]
+→     CLUES inference • window [400 - 425]
+→     CLUES inference • window [425 - 450]
+→     CLUES inference • window [450 - 475]
+→     CLUES inference • window [475 - 500]
+```
+
+Moreover, the user must decide the number of boostraps, considering the computational times it involves (e.g., 100 bootraps can take from 16 to 32 hours per SNP).
+
+In addition to this, the user must also decide, for the SampleBrenchLenghts.sh step (Relate) the number of trees to sample (importance sampling). For the `df` score and the `importance sampling`, we suggest the user to use the same parameters used in phase2 and phase3.
+
+For the boostraps replicate, the user has to provide again the initial and final epochs to scan. We recommend, in order to save computational time, to use a start and end of the epochs to scan not too far from the first onset. As shown in these examples above, the onset based on the first dating was 300 generations ago. Therefore, epochs for the bootraps 0 - 500 were selected, and to have a more fine distribution, a window size of 25 generations was set. 
+
+At the end of the bootstraps phase, the onset inferred by CLUES2 for each bootraps replication is printed to the terminal. these values ​​are used to calculate the summary statistics alongside the *.json.
+
+```
+e.g, on *.json:
+{
+  "rsID": "rs4988235",
+  "population": "FIN_MCM63",
+  "chromosome": "2",
+  "CI95_low_gen": "175"
+  "CI95_high_gen": "425"
+  "CI95_low_year": "4,900"
+  "CI95_high_year": "11,900"
+  "bootstraps": 100
+  "window size": 25
+  "method":"4 consecutive windows with s > 0"
+}
+```
+
 <a name="license"></a>
 
 License
