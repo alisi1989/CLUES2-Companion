@@ -366,7 +366,7 @@ Enter option (1/2/3): 3
 
 ```
           ╔═════════════════════════════════════════════════════════╗
-          ║        ⏱️  PHASE-3 – Dating a selective sweep  ⏱️         ║
+          ║        ⏱️  PHASE 3 – Dating a selective sweep  ⏱️         ║
           ║   Please read the manual carefully before proceeding    ║
           ╚═════════════════════════════════════════════════════════╝
 
@@ -387,28 +387,28 @@ Select the chromosome to analyze:
 If you run Phase 1 and Phase 2 on several chromosomes, the pipeline automatically searches for the Phase 1 and Phase 2 outputs that matches the chromosome that you enter above.
 
 **Enter the population prefix:**
-Provide the same prefix you used in Phase 1 and Phase 2 (e.g. Finnish). Must exactly match the Phase‑1/2 prefix; case‑sensitive. The Phase 3 script now knows the exact folder structure (e.g., output_C2Companion/phase1/Finnish_chr2/).
+Provide the same prefix you used in Phase 1 and Phase 2 (e.g., Finnish). Users must enter the same prefix as the one used in Phase 1 and Phase 2. The Phase 3 script automatically knows the location of input files (e.g., ~/output_C2Companion/phase1/Finnish_chr2/).
 
-**Enter the variant identificator (rs) to date:**
-Provide the `rs` variant to date (e.g. rs4988235). Only one variant per run. The ID must be present in the phased VCF fed to Phase‑1.
+**Enter the rs identifier of SNP to date:**
+Provide the `rs` identifier of SNP to date (e.g., rs4988235). Users can only analyze one variant per run. The rs identifier must be present in the phased vcf used in Phase 1.
 
-**Enter the df score (e.g, 600):**
-Provide the `df` (--df in CLUES2) score (number of allele frequency bins). we suggest to use the same value employed in Phase‑2 for comparability.
+**Enter the df score (e.g., 600):**
+Provide the `df` (--df in CLUES2) score (which is the number of allele frequency bins). We recommend that users apply the same value as used in Phase 2 for comparability.
 
-**Enter the initial epoch to scn for the initial onset:**
-Provide the `first` epoch to scan (e.g, 0 or 50)
+**Enter the starting time in generations ago to scan for the onset of selection:**
+Provide the `start` time point from which to scan (e.g., 0 or 50)
 
-**Enter the final epoch to scn for the initial onset:**
-Provide the `final` epoch to scan (e.g, 500 or 1000). Make sure Final ≥ putative sweep age. When unknown, 0–1000 is a safe default (≈ 0–28 kya). Otherwise a final epoch of 2000 covers most possible scenarios
+**Enter the end time in generations ago to scan for the onset of selection:**
+Provide the `end` time point from which to scan (e.g, 500 or 1000). Users should make sure that the end time in generstions ago ≥ putative sweep age. When unknown, 0–1000 generations ago is a safe default. Otherwise a final end time of 2000 generations ago will cover most possible scenarios
 
-**Enter the non overlapping windows size:**
-Provide a value representing the window size of two consecutive epochs (e.g, 25 or 50). Ff, as in the example, a starting epoch of 0 and a final (--tcutoff) of 500 and a windows size of 50 are provided, the script will automatically create: 0-50, 50-100, 100-150, 150-200 ..... 450-500 epochs to scan to estimate the selection coefficient in each window indipendentely. Smaller windows means higher computational time cost but less noisy  estimates.
+**Enter the non overlapping time bin size:**
+Provide a value representing the initial breakpoint of two consecutive epochs (e.g, 25 or 50). If, as in the example, a starting epoch of 0 and a final (--tcutoff) of 500 and a windows size of 50 are provided, the script will automatically create: 0-50, 50-100, 100-150, 150-200 ..... 450-500 time bins in which selection coefficient will be estimated independentey. Smaller time bins mean longer computational time, but this approach will result in less noisy estimates.
 
 ```
 e.g, :
-Break-points : 0
-50
-100
+Break-points : 0 (0-50)
+50 (50-100)
+100 (100-150)
 150
 200
 250
@@ -430,10 +430,11 @@ Break-points : 0
 Window size  : 50
 ```
 
-when the first dating is complete, a message with the summary results will be printed to the terminal alongside a *.json file with the first dating results:
+When the first dating is complete, a message with the summary results will be printed to the terminal along with a *.json file containing the first dating results:
 
 ```
-e.g., on terminal:
+For example, users will see the following on the terminal:
+
 Initial onset ≈ 300 generations (≈ 8400 years)
 epoch : 300 – 350
 s(MLE) : 0.02187
@@ -454,24 +455,24 @@ e.g, on *.json:
 }
 ```
 
-`After the point estimate the script asks if the users want to proceed with the boostraps:`
+`After the point estimate, the script will ask users if they would like to calculate the confidence intervals using a bootstrap approach:`
 
 ```
 Proceed with bootstrap dating? [y/N]: y
 ```
-`If the users type "y":`
+`If the users type "y", they will be prompted to provide additioanl information (e.g., time bin size and number of replicates):`
 
 ```
 ▶  Bootstrap settings
-Epochs to scan before initial onset (e.g. 200): 50
-Epochs to scan after initial onset (e.g. 500): 500
-Non overlapping windows size  [default is 25]: 25
+Start point to scan in generations ago before initial onset (e.g. 200): 50
+End point to scan in generations ago after initial onset (e.g. 500): 500
+Non-overlapping time bin size  [default is 25]: 25
 Number of bootstrap replicates  [default is 100]: 100
 df score for CLUES2  [default is 450]: 600
 Importance sampling of branch lengths: 200
 
-Break-points : 50
-75
+Break-points : 50 (50-75)
+75 (75-100)
 100
 125
 150
@@ -492,11 +493,11 @@ Break-points : 50
 tCutoff      : 525
 Replicates   : 100
 ```
-**[INFO]**: Runtime note.  100 bootstraps with default parameters typically require 16–32 CPU‑hours per SNP.
+**[INFO]**: Runtime note: 100 bootstraps with default parameters typically require 16–32 CPU‑hours per SNP on a Desktop Intel 24-core computer with 32 Gb RAM.
 
-For the boostraps replicate, the user has to provide again the initial and final epochs to scan. We recommend, in order to save computational time, to use a start and end of the epochs to scan not too far from the first onset. As shown in these examples above, the onset based on the first dating was 300 generations ago. Therefore, epochs for the bootraps 0 - 500 were selected, and to have a more fine distribution, a window size of 25 generations was set. 
+For the boostrap replicates, users must provide a start and end time around the estimated onset of selection. As shown in the examples above, the onset based on the first dating was 300 generations ago. Hence, the time tange 0 - 500 generations ago was selected, and within this range we estimated the selection coefficient for a window size of 25 generations ago.  
 
-The bootraps phase, will create using Relate sample brench lengths, new *.newick files for each replica, then RelateToClues.py will be applied to generate a *_times.txt file for each *.newick file replicated and inference.py (CLUES2) will estimate a selection coefficient in each epoch for each replicates. 
+To calculate confidence intervals, we will perform Phase 1, Phase 2, and Phase 3 (generating *.newick, *_times.txt, *.coal files among others for each SNP) with a random seed n number of times depending on the number of replicates defined by the user. In the end, CLUES2 COMpanion will generate a distribution of onset selection. will performed using Relate sample brench lengths, new *.newick files for each replica, then RelateToClues.py will be applied to generate a *_times.txt file for each *.newick file replicated and inference.py (CLUES2) will estimate a selection coefficient in each epoch for each replicates. 
 Random seeds (--seed $RANDOM) are always used to generate always different coalescence-based genealogies.
 
 ```
