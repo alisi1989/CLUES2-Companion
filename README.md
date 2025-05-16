@@ -538,7 +538,6 @@ e.g, on *.json:
   "rsID": "rs4988235",
   "population": "Finnish_MCM6",
   "chromosome": "2",
-  "onset_median_year": 6636,
   "CI95_low_gen": 155,
   "CI95_high_gen": 344,
   "CI95_low_year": 4340,
