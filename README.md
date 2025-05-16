@@ -536,15 +536,14 @@ At the end of the bootstraps phase, the onset inferred by CLUES2 for each bootra
 e.g, on *.json:
 {
   "rsID": "rs4988235",
-  "population": "FIN_MCM63",
+  "population": "Finnish_MCM6",
   "chromosome": "2",
-  "CI95_low_gen": "175"
-  "CI95_high_gen": "425"
-  "CI95_low_year": "4,900"
-  "CI95_high_year": "11,900"
-  "bootstraps": 100
-  "window size": 25
-  "method":"4 consecutive windows with s > 0"
+  "onset_median_year": 6636,
+  "CI95_low_gen": 155,
+  "CI95_high_gen": 344,
+  "CI95_low_year": 4340,
+  "CI95_high_year": 9632,
+  "method": "4 consecutive windows with s > 0"
 }
 ```
 
