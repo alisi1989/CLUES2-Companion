@@ -1,4 +1,4 @@
-# CLUES2 Companion: Pipelines for estimating and visualizing selection coefficients as well as dating the onset of selective sweeps for multilocus sites 
+# CLUES2 Companion: Computational pipelines to estimate, visualize, and date selection on multilocus sites 
 
 ---
 
@@ -100,7 +100,7 @@ CLUES2 Companion/
     ├ Finnish_chr2.vcf.gz      # phased and indexed vcf
     └ Finnish.poplabels        # sampleID, population, group, SEX
 ```
-Users must use fully phased vcf and indexed files (e.g., *.vcf.gz and *.tbi files). 
+Users must use fully phased vcf and indexed files (e.g., *.vcf.gz and *.tbi files). If your input data are GRCh38/hg38, please ensure chromosomes are encoded with prefix 'chr' (e.g. chr20). Alternatively, if your input data are GRCh37/hg19 please ensure chromosomes are encoded without prefix (e.g. 20)
 
 Furthermore, the vcf file must contain only one population and one chromosome (e.g., example/Finnish_chr2.vcf.gz)
 
