@@ -406,27 +406,28 @@ Provide a value representing the initial breakpoint of two consecutive epochs (e
 
 ```
 e.g, :
-Break-points : 0 (0-50)
+Break-points : 50 (0-50)
 50 (50-100)
 100 (100-150)
-150
-200
-250
-300
-350
-400
-450
-500
-550
-600
-650
-700
-750
-800
-850
-900
-950
-1000
+150 (150-200)
+200 (200-250)
+250 (250-300)
+300 (300-350)
+350 (350-400)
+400 (400-450)
+450 (450-500)
+500 (500-550)
+550 (550-600)
+600 (600-650)
+650 (650-700)
+700 (700-750)
+750 (750-800)
+800 (800-850)
+850 (850-900)
+900 (900-950)
+950 (950-1000)
+1000 (1000-1050)
+tCutoff      : 1050
 Window size  : 50
 ```
 
@@ -471,33 +472,31 @@ Number of bootstrap replicates  [default is 100]: 100
 df score for CLUES2  [default is 450]: 600
 Importance sampling of branch lengths: 200
 
-Break-points : 50 (50-75)
+Break-points : 25 (50-75)
 75 (75-100)
-100
-125
-150
-175
-200
-225
-250
-275
-300
-325
-350
-375
-400
-425
-450
-475
-500
+100 (100-125)
+125 (125-150)
+150 (150-175)
+175 (175-200)
+200 (200-225)
+225 (225-250)
+250 (250-275)
+275 (275-300)
+300 (300-325)
+325 (325-350)
+350 (350-375)
+375 (375-400)
+400 (400-425)
+425 (425-450)
+450 (450-475)
+475 (475-500)
+500 (500-525)
 tCutoff      : 525
 Replicates   : 100
 ```
 **[INFO]**: Runtime note: 100 bootstraps with default parameters typically require 16–32 CPU‑hours per SNP on a Desktop Intel 24-core computer with 32 Gb RAM.
 
-For the boostrap replicates, users must provide a start and end time around the estimated onset of selection. As shown in the examples above, the onset based on the first dating was 300 generations ago. Hence, the time tange 0 - 500 generations ago was selected, and within this range we estimated the selection coefficient for a window size of 25 generations ago.  
-
-To calculate confidence intervals, we will perform Phase 1, Phase 2, and Phase 3 (generating *.newick, *_times.txt, *.coal files among others for each SNP) with a random seed n number of times depending on the number of replicates defined by the user. Please note that users will be prompted to provide parameters for each replicate. In the end, CLUES2 Companion will generate a distribution of selection onsets from which lower and upper bounds of time in generations, representing the confidence intervals will be determined by the user. 
+To calculate confidence intervals, users will be prompted to provide a start and end time around the estimated onset of selection. For example, if the onset of selection was inferred to be 300 gen. ago (8,400 years ago), users could choose lower bound of 0 and an upper bound of 2,000 generations ago as starting point to calculate the confidence intervals around the onset of selection (in this case, 300 generations ago). Alternatively, to decrease the computational time, users could choose a smaller range, for example a lower bound of 0 and upper bound of 500 gen. ago to search for the upper and lower bounds of selection onset. Regardless of the choice, within the given range, our method will calculate s for each segmented non-overlapping window of size m (m=25 gen. is the default window size) and scan for consecutive windows with s > 0 and P < 0.05 to infer selection onset using the same trend-based procedure described above. The entire process of running Relate and CLUES2, including the calculation of s and P–values in segmented windows, is repeated n times (n the number of replicates defined by the user with a random seed, generating an empirical distribution of age of selection onset. CLUES2 Companion then will calculate the 2.5th and 97.5th percentiles of this distribution, which represent the lower and upper bounds of the confidence interval, respectively. 
 
 ```
 For example, if users selected 100 replicates,
@@ -524,7 +523,6 @@ For example, if users selected 100 replicates,
 →     CLUES inference • window [450 - 475]
 →     CLUES inference • window [475 - 500]
 ```
-
 
 Users must also decide the number of trees to sample (importance sampling using the SampleBrenchLenghts.sh script in Relate). For the `df` score and the `importance sampling`, we recommend that users apply the same parameters that were used in Phase 2 and Phase 3.
 
