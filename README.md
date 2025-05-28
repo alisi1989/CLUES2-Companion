@@ -51,9 +51,10 @@ will interfere with the functioning of Phase 1, Phase 2 and Phase 3 algorithms.
 ## Installation
 
 To download CLUES2 Companion, please use the link below. However, before running our software, please read the `README_before_use.txt` file. 
-```bash
+
 https://www.dropbox.com/scl/fo/m5y6aek0twd1jz9grg4p3/ALxMgIljUJRIZZNQXaGU-OE?rlkey=mbbh36ondftnqg0x07eao57eg&st=lryscqdm&dl=0
-```
+
+
 Ensure your working dir contains the following sub-folders:
 
 ```
