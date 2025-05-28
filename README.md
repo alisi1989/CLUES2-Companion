@@ -7,7 +7,7 @@
 **CLUES2Companion.sh** is a comprehensive three-phase pipeline that includes:
 
 - **Phase 1**:  
-  - Converts VCF → `.haps` & `.sample`  
+  - Converts vcf to `.haps` & `.sample`  
   - Prepares input (masking, flipping, filtering)  
   - Runs Relate (two passes to `.anc`, `.mut`, `.coal`)  
   - Extracts SNPs, polarized derived allele per SNP, and derived allele frequency table  
@@ -50,10 +50,9 @@ will interfere with the functioning of Phase 1, Phase 2 and Phase 3 algorithms.
 <a name="Installation"></a>
 ## Installation
 
+To download CLUES2 Companion, please use the link below. However, before running our software, please read the `README_before_use.txt` file. 
 ```bash
-git clone https://github.com/alisi1989/CLUES2_Companion.git
-cd CLUES2_Companion
-chmod +x CLUES2Companion.sh
+https://www.dropbox.com/scl/fo/m5y6aek0twd1jz9grg4p3/ALxMgIljUJRIZZNQXaGU-OE?rlkey=mbbh36ondftnqg0x07eao57eg&st=lryscqdm&dl=0
 ```
 Ensure your working dir contains the following sub-folders:
 
@@ -66,6 +65,13 @@ required_files/
   └ map/genetic_map_chrN.txt  
 ```
 
+To access the download directory, please use the following command:
+
+```
+cd /path_to_folder/CLUES2Companion
+chmod +x CLUES2Companion-Linux.sh
+
+```
 <a name="dependencies"></a>
 
 ## Dependencies
