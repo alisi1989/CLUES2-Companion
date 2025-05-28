@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ------------------------------------------------------------------
-#  CLUES2Companion pipeline – v2025‑04‑16
+#  CLUES2Companion pipeline
 #  • Phase‑1  : Relate + SNP extraction + Derived files + frequency
 #  • Phase‑2  : BranchLengths → RelateToCLUES → inference → merge
 #  • Phase‑3  : Dating target SNP(s)
@@ -45,14 +45,14 @@ echo
 echo "******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******"
 cat <<EOF
 Choose phase to run
-  1) Phase-1  : Relate (*.mut, *.anc, *.coal files) and SNP/Derived/DAF
-  2) Phase-2  : Relate (BranchLengths) → RelateToCLUES.py → inference.py → outputs
-  3) Phase-3  : Dating target SNP(s)
+  1) Phase 1  : Apply Relate (*.mut, *.anc, *.coal files along with derived allele frequency)
+  2) Phase 2  : Apply Relate (BranchLengths) and CLUES2 (RelateToCLUES.py and inference.py)
+  3) Phase 3  : Date onset of selective sweeps of target SNP(s)
 EOF
 read -rp "Enter option (1/2/3): " OPTION
 echo
 
-# ---------- PHASE‑1  ---------------------------------------------------------
+# ---------- PHASE 1  ---------------------------------------------------------
 phase1() {
   PH="phase1"
   echo -e "\n          ╔═════════════════════════════════════════════════════════╗"
@@ -141,6 +141,7 @@ phase1() {
   
   echo
   info "Preparing input files → *.haps.gz, *.sample.gz, *.dist and *.annot"
+  rand_seed() { echo $(( ( RANDOM << 15 ) | RANDOM )); }
   
   "${relate_root}/scripts/PrepareInputFiles/PrepareInputFiles.sh" \
       --haps      "$haps_path" \
@@ -148,6 +149,7 @@ phase1() {
       --ancestor  "$ancestral" \
       --mask      "$mask" \
       --poplabels "$pop_labels" \
+      --seed "$(rand_seed)" \
       -o          "$pif_base" 2>/dev/null &
   
   pid=$!
@@ -167,10 +169,11 @@ info "Running Relate mode All with random Ne → *.anc and *.mut files"
 
 pushd "$WORK_DIR" >/dev/null   # entra nella dir di lavoro
 
+rand_seed() { echo $(( ( RANDOM << 15 ) | RANDOM )); }
 "${relate_root}/bin/Relate" --mode All \
     --haps  "$pif_haps" --sample "$pif_sample" \
     --map   "$genmap"   --annot "$pif_annot" \
-    -N 30000 -m 1.25e-8 --seed 1 -o GS_tmp 2>/dev/null &
+    -N 30000 -m 1.25e-8 -o GS_tmp --seed "$(rand_seed)" 2>/dev/null &
 
   pid=$!
   spinner_bar "$pid" 0.5 30
@@ -189,12 +192,12 @@ pushd "$WORK_DIR" >/dev/null   # entra nella dir di lavoro
   
   pushd "$WORK_DIR" >/dev/null
   
+  rand_seed() { echo $(( ( RANDOM << 15 ) | RANDOM )); }
   "${relate_root}/scripts/EstimatePopulationSize/EstimatePopulationSize.sh" \
         -i "${gs_base}_run1" -o "${coal_base}" \
         --noanc 1 --poplabels "$pop_labels" \
-        -m 1.25e-8 --years_per_gen 28 --seed 1 2>/dev/null &
+        -m 1.25e-8 --years_per_gen 28 --seed "$(rand_seed)" 1 2>/dev/null &
       
-
   pid=$!
   spinner_bar "$pid" 0.5 30
   wait "$pid" || true
@@ -205,29 +208,34 @@ pushd "$WORK_DIR" >/dev/null   # entra nella dir di lavoro
  popd >/dev/null
  echo "✓ Estimating Population size done"
  
-  # -------------------------------------------------------------------------
-  # 8. Relate run‑2  (final .anc/.mut)
-  # -------------------------------------------------------------------------
- echo
- info "Running Relate mode All with *.coal file → *.anc and *.mut based on coalescence"
-  
- pushd "$WORK_DIR" >/dev/null   # entra nella dir di lavoro
+ # -------------------------------------------------------------------------
+# 8.  Re-estimate branch lengths given the *.coal file
+# -------------------------------------------------------------------------
+echo
+info "Re-estimating branch lengths (MCMC) to obtain final *.anc/*.mut"
 
-"${relate_root}/bin/Relate" --mode All \
-    --haps  "$pif_haps" --sample "$pif_sample" \
-    --map   "$genmap"   --annot "$pif_annot" \
+pushd "$WORK_DIR" >/dev/null
+rand_seed() { echo $(( ( RANDOM << 15 ) | RANDOM )); }
+"${relate_root}/scripts/SampleBranchLengths/ReEstimateBranchLengths.sh" \
+    -i  "${gs_base}_run1" \
+    -o  "${gs_coal}" \
+    -m  1.25e-8 \
     --coal "${coal_base}.coal" \
-    -m 1.25e-8 --seed 1 -o GS_tmp2 2>/dev/null &
- 
-  pid=$!
-  spinner_bar "$pid" 0.5 30
-  wait "$pid" || true
-  for f in GS_tmp2.*; do mv "$f" "${gs_coal}${f#GS_tmp2}"; done
-  popd >/dev/null
-  echo "✓ Relate mode All with *.coal file done"
-  
-  mut_file="${gs_coal}.mut"
-  haps_file="${pif_base}.haps.gz"
+    --seed "$(rand_seed)" \
+    2>/dev/null &      # & deve stare su una riga nuova, senza back-slash sopra
+
+pid=$!
+spinner_bar "$pid" 0.5 30
+wait "$pid" || {
+    popd >/dev/null
+    error "ReEstimateBranchLengths failed – check log."
+}
+
+popd >/dev/null
+echo "✓ Branch lengths re-estimated"
+
+mut_file="${gs_coal}.mut"
+haps_file="${pif_base}.haps.gz"
 
   # -------------------------------------------------------------------------
   # 9. SNP extraction
@@ -313,17 +321,17 @@ rm -f "${WORK_DIR}"/*.rate \
       
   mark_done "$WORK_DIR"
   echo
-  info "✓ Phase‑1 completed — outputs in ${WORK_DIR}"
+  info "✓ Phase 1 completed — outputs in ${WORK_DIR}"
   printf "\n"
 }
 
-# ---------- PHASE-2  (BranchLengths → RelateToCLUES → CLUES → merge) ----------
+# ---------- PHASE 2  (BranchLengths → RelateToCLUES → CLUES2 → merge) ----------
 phase2() {
 
   PH="phase2"
 
   echo -e "\n          ╔═════════════════════════════════════════════════════════╗"
-  echo -e "          ║        🧬  PHASE-2 – (requires Phase‑1 outputs)  🧬     ║"
+  echo -e "          ║       🧬  PHASE 2 – (requires Phase‑1 outputs)  🧬      ║"
   echo -e "          ║   Please read the manual carefully before proceeding    ║"
   echo -e "          ╚═════════════════════════════════════════════════════════╝\n"
   # -------------------------------------------------------------------------
@@ -390,7 +398,7 @@ phase2() {
   # -------------------------------------------------------------------------
   read -rp "tCutoff (e.g. 1000): " tcutoff
   read -rp "df (e.g. 600): "      df_score
-  read -rp "importance sampling of branch lengths: " num_samples
+  read -rp "Importance sampling of branch lengths: " num_samples
   read -rp "AncientSamps file (optional, ENTER to skip): " anc_samps
   read -rp "AncientHaps  file (optional, ENTER to skip): " anc_haps
   read -rp "Disable allele trajectory? (y/N): " no_traj
@@ -441,12 +449,13 @@ stepA() {
   grep -v -E '^(rsID|rsid|#)' "$snp_file" |
   while read -r rsid pos; do
     [[ -z $rsid || -z $pos ]] && continue
+    rand_seed() { echo $(( ( RANDOM << 15 ) | RANDOM )); }
     "${relate_root}/scripts/SampleBranchLengths/SampleBranchLengths.sh" \
         --input "$gs_prefix" \
         --output "${TREE_DIR}/${rsid}" \
         --first_bp "$pos" --last_bp "$pos" \
         --format n --num_samples "$num_samples" \
-        --coal "$coal_file" --seed 1 -m 1.25e-8 &>/dev/null \
+        --coal "$coal_file" -m 1.25e-8 --seed "$(rand_seed)" &>/dev/null \
         || warn "BranchLengths failed for $rsid"
   done
 }
@@ -635,15 +644,17 @@ echo
 phase3() {
   PH="phase3"
   echo -e "\n          ╔═════════════════════════════════════════════════════════╗"
-  echo -e "          ║        ⏱️  PHASE-3 – Dating a selective sweep  ⏱️         ║"
+  echo -e "          ║        ⏱️  PHASE 3 – Dating a selective sweep  ⏱️         ║"
   echo -e "          ║   Please read the manual carefully before proceeding    ║"
   echo -e "          ╚═════════════════════════════════════════════════════════╝\n"
   # ------------------------ user input --------------------------------------
   read -rp "Choose chromosome to analyze (e.g. 2, 17, X): "  chr
-  read -rp "Same prefix population name as used in Phase-2 (e.g. Finnish): "    pop
+  read -rp "Same prefix population name as used in Phase 2 (e.g. Finnish): "    pop
   read -rp "rsID of SNP to date   (e.g. rs123): "  rsid
   read -rp "df score for CLUES2 (e.g. 600): "      df_score
-
+  read -rp "Initial epoch to scan for initial onset (e.g. 0 or 50): "   G_START
+  read -rp "Final epoch to scan for initial onset (e.g. 500 or 1000): " G_END
+  read -rp "Non overlapping windows size  [default is 50]: "       STEP ; STEP=${STEP:-50}
   # ------------------------ paths produced in phase-1/2 ---------------------
   P1_DIR="${WORK_BASE}/phase1/${pop}_chr${chr}"
   P2_DIR="${WORK_BASE}/phase2/${pop}_chr${chr}"
@@ -655,7 +666,7 @@ phase3() {
   WORK_DIR="${WORK_BASE}/phase3/${RUN_ID}"
   mkdir -p "$WORK_DIR"
   printf "\n"
-  info "[INFO]Phase-3 working dir: $WORK_DIR"
+  info "[INFO]Phase 3 working dir: $WORK_DIR"
 
   COAL="${P1_DIR}/${pop}_EPS4COAL_chr${chr}.coal"
   [[ -f "$COAL" ]] || error "*.coal file missing"
@@ -680,7 +691,7 @@ phase3() {
   rtc_py="${CLUES_DIR}/RelateToCLUES.py"
 
 # -------------------------------------------------------------------------
-# (A)  Sliding-window scan: one CLUES run per interval
+# (A)  Sliding-window scan: one CLUES2 run per interval
 # -------------------------------------------------------------------------
 TIMES0="${P2_DIR}/${pop}_times_chr${chr}/${rsid}_times.txt"
 [[ -f "$TIMES0" ]] || error "times file missing ($TIMES0)"
@@ -689,102 +700,157 @@ TIMES0="${P2_DIR}/${pop}_times_chr${chr}/${rsid}_times.txt"
 TIMES_FILE="${WORK_DIR}/${rsid}_times.txt"
 cp "$TIMES0" "$TIMES_FILE"
 
-# break-points:
-BREAKS=(0 50 100 150 200 250 300 350 400 450 500 550 600 650 700 750 800 900 1000 1200 1400 1600 1800 2000)
+# ---------------- build BREAKS from user input -----------------
+if (( STEP <= 0 )) || (( G_START >= G_END )); then
+    error "STEP must be >0 and G_START < G_END"
+fi
 
-echo -e "\n▶  Scanning windows:"
-WIN_PREFIXES=()
+# array BREAKS: G_START, G_START+STEP, …, G_END
+if declare -F mapfile >/dev/null; then      # Bash ≥ 4
+    mapfile -t BREAKS < <( seq "$G_START" "$STEP" "$G_END" )
+else                                        # fallback Bash 3.x
+    IFS=$'\n' read -r -d '' -a BREAKS < <( seq "$G_START" "$STEP" "$G_END"; printf '\0' )
+fi
 
+# assicura che l'ultima boundary sia ESATTAMENTE G_END
+last_break=${BREAKS[${#BREAKS[@]}-1]}
+(( last_break != G_END )) && BREAKS+=( "$G_END" )
+
+# ---------------- stampa riepilogo BREAKS -----------------------------------
+printf "\nBreak-points (STEP (%s-%s)):\n" "left" "right"
 for (( i=0; i<${#BREAKS[@]}-1; i++ )); do
     left=${BREAKS[i]}
     right=${BREAKS[i+1]}
-    out_pref="${INF_OUT}_${left}_${right}"
-    WIN_PREFIXES+=("$out_pref")
+    printf "%-4d (%d-%d)\n"  "$STEP"  "$left" "$right"
+done
+printf "tCutoff      : %d\n"  "${BREAKS[${#BREAKS[@]}-1]}"
+printf "Window size  : %d\n\n"  "$STEP"
 
-    echo "   •  window [$left - $right]"
+# ---------------- loop sulle finestre ---------------------------------------
+echo "▶  Scanning windows:"
+for (( i=0; i<${#BREAKS[@]}-1; i++ )); do
+    left=${BREAKS[i]}
+    right=${BREAKS[i+1]}
 
-    if (( left == 0 )); then        # prima finestra: NIENTE --timeBins
-        python "$inf_py" \
-            --times   "$TIMES_FILE" \
-            --popFreq "$freq" \
-            --out     "$out_pref" \
-            --df "$df_score" \
-            --tCutoff "$right" \
-            --coal    "$COAL" \
-            --noAlleleTraj  >/dev/null
-    else                            # finestre successive: un solo breakpoint
-        python "$inf_py" \
-            --times   "$TIMES_FILE" \
-            --popFreq "$freq" \
-            --out     "$out_pref" \
-            --df "$df_score" \
-            --tCutoff "$right" \
-            --timeBins "$left" \
-            --coal    "$COAL" \
-            --noAlleleTraj  >/dev/null
-    fi
+    win_pref="${INF_OUT}_${left}_${right}"
+    info "    CLUES2 • window [${left}-${right}]"
+
+    cmd=( python "$inf_py"
+          --times   "$TIMES_FILE"
+          --popFreq "$freq"
+          --out     "$win_pref"
+          --df      "$df_score"
+          --CI      0.95
+          --tCutoff "$right"
+          --coal    "$COAL"
+          --noAlleleTraj )
+
+    (( left > 0 )) && cmd+=( --timeBins "$left" )
+
+    "${cmd[@]}" >/dev/null 2>&1 || {
+        warn "      ➜ CLUES2 failed – window skipped"
+        continue
+    }
 done
 
-
 # -------------------------------------------------------------------------
-#  (A-2)  Raccogli i risultati dei singoli file e trova l’onset
+#  (A-2)  Collect inference results and determine onset
+# -------------------------------------------------------------------------
+# Expects the following environment variables to be set by the shell layer:
+#   INF_OUT – root prefix to inference files (e.g.  .../rs4988235)
+#   rsid    – SNP identifier
+#   pop     – population label
+#   chr     – chromosome
 # -------------------------------------------------------------------------
 export INF_OUT rsid pop chr # let's read the variable for PY block
 python - <<'PY'
-import glob, os, re, pandas as pd, sys, json, pathlib, numpy as np
+import glob, os, re, pandas as pd, json, pathlib, numpy as np, sys
 
-pref_root = os.environ['INF_OUT']         # es.  .../rs4988235
-pattern   = f"{pref_root}_*_*.txt"        # match *_start_end_inference.txt
-files     = sorted(glob.glob(pattern),
-                   key=lambda p: int(re.search(r'_(\d+)_', p).group(1)),
-                   reverse=True)          # ancient → recent
+# ------------------------- gather files ----------------------------------
+pref_root = os.environ['INF_OUT']                 # e.g.  /path/to/rs4988235
+pattern   = f"{pref_root}_*_*.txt"               # *_start_end_inference.txt
+files     = sorted(
+    glob.glob(pattern),
+    key=lambda p: int(re.search(r'_(\d+)_', p).group(1)),
+    reverse=True)                                # oldest (large gen) → recent
 
-windows = []
+windows = []  # will hold tuples: (start, end, s_MLE, p_val)
 for f in files:
     m = re.search(r'_(\d+)_(\d+)_inference\.txt$', f)
-    if not m:  continue
-    start,end = map(int, m.groups())
+    if not m:
+        continue
+    start, end = map(int, m.groups())
     row = pd.read_csv(f, sep="\t").iloc[0]
-    # prendi SEMPRE l’ultima colonna SelectionMLE k
+    # take the *last* SelectionMLE column (highest k)
     last_k = max(int(c.split("SelectionMLE")[1])
                  for c in row.index if c.startswith("SelectionMLE"))
-    s = row[f"SelectionMLE{last_k}"]
-    p   = 10**(-row["-log10(p-value)"]) if "-log10(p-value)" in row else np.nan
-    windows.append( (start,end,s,p) )
+    s_val = row[f"SelectionMLE{last_k}"]
+    p_val = 10**(-row["-log10(p-value)"]) if "-log10(p-value)" in row else np.nan
+    windows.append((start, end, s_val, p_val))
 
-# ------------- criterio onset ---------------------------------------------
-def first_trend(ws, k):
-    for i in range(len(ws)-k+1):
-        seg = ws[i:i+k]         # antico → recente
-        ss  = [x[2] for x in seg]
-        if all(val>0 for val in ss) and all(ss[j]>=ss[j-1] for j in range(1,k)):
-            return seg[0]
+if not windows:
+    sys.exit("[ERROR] No inference files found – check INF_OUT prefix and path.")
+
+# ----------------------- helper to find consecutive -----------------------
+
+def find_consecutive(pos_windows, k):
+    """Return (window, k) if k consecutive windows have s>0, else None."""
+    for i in range(len(pos_windows) - k + 1):
+        segment = pos_windows[i:i + k]      # ancient → recent order
+        if all(w[2] > 0 for w in segment):
+            return segment[0], k            # left‑most (oldest) window and k
     return None
 
-onset = ( first_trend(windows,3) or
-          first_trend(windows,2) or
-          next((w for w in windows if w[2]>0), None) or
-          max(windows, key=lambda t:t[2]) )
+# ----------------------- onset detection logic ---------------------------
+criterion_messages = []
+result = None
+for k in (4, 3, 2):
+    res = find_consecutive(windows, k)
+    if res:
+        result = res
+        method_used = f"{k} consecutive windows > 0"
+        if k == 4:
+            print("Detected onset using criterion: 4 consecutive windows > 0\n")
+        elif k == 3:
+            print("Criterion 4 consecutive s > 0 not satisfied; using 3 consecutive windows > 0\n")
+        else:  # k == 2
+            print("[WARNING] Criterion 4 consecutive s > 0 not satisfied and 3 consecutive s > 0 not satisfied; using 2 consecutive windows > 0\n")
+        break
 
-st,en,s,_ = onset
-print(f"\nInitial onset ≈ {st} generations  (≈ {st*28} years)")
-print(f"   epoch   : {st} – {en}")
-print(f"   s(MLE)  : {s:.5f}\n")
+# If none of the consecutive‑positive criteria hit, fall back to previous heuristics
+if result is None:
+    print("[WARNING] No block of 2 consecutive positive‑s windows found – falling back to maximum s estimate\n")
+    result = (next((w for w in windows if w[2] > 0), None) or max(windows, key=lambda t: t[2]), 1)
+    method_used = "fallback: first positive or max s"
 
-# opzionale: salva un JSON intermedio
-quick_out = pathlib.Path(f"{pref_root}_InitialOnset_Dating.json")
-quick_out.write_text(json.dumps(dict(
-        rsID=os.environ["rsid"],
-        population        = os.environ["pop"],
-        chromosome        = os.environ["chr"],
-        onset_gen = int(st),
-        onset_years = int(st*28),
-        epoch_start = st,
-        epoch_end   = en,
-        epoch_start_years   = int(st*28),
-        epoch_end_years = int(en*28),
-        s_MLE       = round(s,5)
-    ), indent=2))
+(onset_win, k_used) = result
+st, en, s_mle, _ = onset_win
+median_gen   = int(round((st + en) / 2))
+median_years = median_gen * 28
+
+# ----------------------- screen output -----------------------------------
+print(f"\nInitial onset (median of window) ≈ {median_gen} generations  (≈ {median_years} years)")
+print(f"   window   : {st} – {en} generations")
+print(f"   s(MLE)   : {s_mle:.5f}")
+print(f"   method   : {method_used}\n")
+
+# ----------------------- JSON output -------------------------------------
+json_out = pathlib.Path(f"{pref_root}_InitialOnset_Dating.json")
+json_out.write_text(json.dumps(dict(
+    rsID                 = os.environ["rsid"],
+    population           = os.environ["pop"],
+    chromosome           = os.environ["chr"],
+    median_onset_gen     = median_gen,
+    median_onset_years   = median_years,
+    epoch_start          = st,
+    epoch_end            = en,
+    epoch_start_years    = st * 28,
+    epoch_end_years      = en * 28,
+    method               = method_used,
+    s_MLE                = round(s_mle, 5)
+), indent=2))
+
+print(f"[INFO] JSON written to: {json_out}\n")
 PY
 
 # -------------------------------------------------------------------------
@@ -794,7 +860,7 @@ PY
 # >>> ask if the user want proceed with the bootstraps, otherwise exit <<<
 read -rp "Proceed with bootstrap dating? [y/N]: " REPLY
 if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
-    echo -e "\nBootstrap step skipped – Phase-3 completed."
+    echo -e "\nBootstrap step skipped – Phase 3 completed."
     return            # esce dalla funzione phase3 (o 'exit 0' se non è in funzione)
 fi
 
@@ -802,9 +868,9 @@ fi
 #  (B)  bootstrap parameters
 # -----------------------------------------------------------------
 echo -e "\n▶  Bootstrap settings"
-read -rp "Epochs to scan before initial onset (e.g. 200): "   G_START
-read -rp "Epochs to scan after initial onset (e.g. 500): " G_END
-read -rp "Non overlapping windows size  [default is 25]: "       STEP ; STEP=${STEP:-25}
+read -rp "Start point to scan in generations ago before initial onset (e.g. 0 or 100): "   G_START
+read -rp "End point to scan in generations ago after initial onset (e.g. 500): " G_END
+read -rp "Non-overlapping time bin size  [default is 25]: "       STEP ; STEP=${STEP:-25}
 read -rp "Number of bootstrap replicates  [default is 100]: "       NBOOT; NBOOT=${NBOOT:-100}
 read -rp "df score for CLUES2  [default is 450]: "      DF   ; DF=${DF:-450}
 read -rp "Importance sampling of branch lengths: " num_samples
@@ -812,24 +878,28 @@ read -rp "Importance sampling of branch lengths: " num_samples
 # ---------- build BREAKS ----------------------------------------------------
 if declare -F mapfile >/dev/null; then          # Bash ≥ 4
     mapfile -t BREAKS < <( seq "$G_START" "$STEP" "$G_END" )
-else                                            # fallback portabile
-    IFS=$'\n' read -r -d '' -a BREAKS < <( seq "$G_START" "$STEP" "$G_END" ; printf '\0' )
+else                                            # Bash 3.x fallback
+    IFS=$'\n' read -r -d '' -a BREAKS < <( seq "$G_START" "$STEP" "$G_END"; printf '\0' )
 fi
 
+# assicura che l’ultima boundary sia esattamente G_END
 last_break=${BREAKS[${#BREAKS[@]}-1]}
-if (( last_break != G_END )); then
-    BREAKS+=( "$G_END" )
-fi
+(( last_break != G_END )) && BREAKS+=( "$G_END" )
 
-# quick sanity-check
+# sanity-check
 (( ${#BREAKS[@]} == 0 )) && error "seq produced no break-points"
 
 TCUT=$(( G_END + STEP ))        # --tCutoff passato a CLUES
 
-echo -e "\nBreak-points : ${BREAKS[*]}"
-echo   "tCutoff      : $TCUT"
-echo   "Replicates   : $NBOOT"
-echo
+# ---------------- stampa riepilogo ------------------------------------------
+printf "\nBreak-points (STEP (%s-%s)):\n" "left" "right"
+for (( i=0; i<${#BREAKS[@]}-1; i++ )); do
+    left=${BREAKS[i]}
+    right=${BREAKS[i+1]}
+    printf "%-4d (%d-%d)\n"  "$STEP"  "$left" "$right"
+done
+printf "tCutoff      : %d\n"   "$TCUT"
+printf "Replicates   : %d\n\n" "$NBOOT"
 
 ##############################################################################
 #  C)  N BOOTSTRAP REPLICATES                           #
@@ -839,7 +909,7 @@ GS_PREFIX="${P1_DIR}/${pop}_GS+COAL_chr${chr}"
 POS=$(grep -m1 -w "$rsid" "${P1_DIR}/${pop}_SNPs_chr${chr}_"*.txt | cut -f2) \
      || error "bp position for $rsid not found"
 
-echo -e "\n▶  Generating $NBOOT bootstrap trees & CLUES runs"
+echo -e "\n▶  Generating $NBOOT bootstrap trees & CLUES2 runs"
 
 for (( rep=1; rep<=NBOOT; rep++ )); do
     seed=$(( ( RANDOM << 15 ) ^ RANDOM ))
@@ -857,13 +927,13 @@ for (( rep=1; rep<=NBOOT; rep++ )); do
                      --RelateSamples "${nw_pref}.newick" \
                      --out "$nw_pref" &>/dev/null
 
-# ---- CLUES runs each windows --------------------------------------
+# ---- CLUES2 runs each windows --------------------------------------
 for (( i=0; i<${#BREAKS[@]}-1; i++ )); do
     left=${BREAKS[i]} ; right=${BREAKS[i+1]}
     win_pref="${nw_pref}_${left}_${right}"
     #log="${win_pref}_clues.log"
     
-    info "    CLUES inference • window [$left - $right]"
+    info "    CLUES2 inference • window [$left - $right]"
 
     cmd=( python "$inf_py" --times "${nw_pref}_times.txt"
           --popFreq "$freq" --out "$win_pref"
@@ -872,7 +942,7 @@ for (( i=0; i<${#BREAKS[@]}-1; i++ )); do
     (( left > 0 )) && cmd+=( --timeBins "$left" )
 
     "${cmd[@]}" >/dev/null 2>&1 || {
-        warn "      ➜ CLUES failed – window skipped"
+        warn "      ➜ CLUES2 failed – window skipped"
         continue
     }
 done
@@ -922,6 +992,7 @@ output="onset_bootstraps.txt"
 
 echo -e "\n▶  Computing onset for each bootstrap…"
 onset_vals=()
+method_vals=()
 
 for (( rep=1; rep<=NBOOT; rep++ )); do
     combo="${BOOT_DIR}/bootstrap_${rep}_${rsid}.txt"
@@ -930,37 +1001,56 @@ for (( rep=1; rep<=NBOOT; rep++ )); do
         continue
     fi
 
-    onset=$(python - <<'PY' "$combo"
-import sys, pandas as pd
+onset_and_method=$(python3 - <<'PY' "$combo"
+import sys, pandas as pd, math
 
-wins=[]
-df=pd.read_csv(sys.argv[1], sep="\t")
+wins = []
+df = pd.read_csv(sys.argv[1], sep="\t")
 
 for _, row in df.iterrows():
     st, en = int(row["Epoch2_start"]), int(row["Epoch2_end"])
-    k  = max(int(c.split("SelectionMLE")[1]) for c in row.index if c.startswith("SelectionMLE"))
-    s  = row[f"SelectionMLE{k}"]
+    s      = float(row["SelectionMLE2"])
     wins.append((st, en, s))
 
-# ordine antico → recente
 wins.sort(key=lambda w: w[0], reverse=True)
 
-def streak(ws, k):
-    for i in range(len(ws)-k+1):
-        if all(w[2] > 0 for w in ws[i:i+k]):
-            return ws[i][0]
-    return None
+def median(st, en):
+    return int(round((st + en) / 2))
 
-o = streak(wins, 3) or streak(wins, 2) \
-    or next((w[0] for w in wins if w[2] > 0), None) \
-    or max(wins, key=lambda w: w[2])[0]
+def find_onset(wlist, k):
+    for i in range(len(wlist) - k + 1):
+        seg = wlist[i:i + k]
+        if all(w[2] > 0 for w in seg):
+            st, en, _ = seg[0]
+            return median(st, en), f"{k} consecutive s>0"
+    return None, None
 
-print(o)
+onset, method = None, None
+for k in (4, 3, 2):
+    onset, method = find_onset(wins, k)
+    if onset is not None:
+        break
+
+if onset is None:
+    for st, en, s in wins:
+        if s > 0:
+            onset  = median(st, en)
+            method = "first positive s"
+            break
+
+if onset is None:
+    st, en, _ = max(wins, key=lambda w: w[2])
+    onset  = median(st, en)
+    method = "max s"
+
+print(f"{onset}\t{method}")
 PY
 )
 
-    # formato riga sia per terminale che per file
-    line=$(printf "Bootstrap %2d : %s generations" "$rep" "$onset")
+IFS=$'\t' read -r onset method <<< "$onset_and_method"
+method_vals+=("$method")
+line=$(printf "Bootstrap %2d : %s gen  (%s)" "$rep" "$onset" "$method")
+
     echo  "$line"        # stampa a terminale
     echo  "$line" >> "$output"  # salva in append
 
@@ -995,10 +1085,25 @@ echo
 #echo "Median onset : $MEDIAN gen (~$(( MEDIAN * 28 )) yr)"
 echo "95 % CI      : $CI_LOW – $CI_HIGH gen "\
      "(~$(( CI_LOW * 28 )) – $(( CI_HIGH * 28 )) yr)"
+     
+
+# ------------------------------------------------------------------
+#  Metodo prevalente tra i bootstrap
+# ------------------------------------------------------------------
+if ((${#method_vals[@]})); then
+    prevailing_method=$(printf '%s\n' "${method_vals[@]}" \
+                        | sort | uniq -c | sort -nr | head -1 \
+                        | awk '{print $2" ("$1"×)"}')
+else
+    prevailing_method="NA"
+fi
+
 
 ##############################################################################
 #  F)  JSON OUTPUT                                                           #
 ##############################################################################
+export PREV_METHOD="$prevailing_method"
+
 python3 - <<PY
 import json, pathlib, os
 out = dict(
@@ -1013,7 +1118,7 @@ out = dict(
     CI95_high_year    = int("$CI_HIGH")*28,
     bootstraps        = int("$NBOOT"),
     step              = int("$STEP"),
-    method            = "4 consecutive windows with s > 0"
+    method            = os.environ["PREV_METHOD"]
 )
 
 out_dir = pathlib.Path("$BOOT_DIR").parent          # ← usa la variabile bash
