@@ -19,7 +19,7 @@
   - Merges information on multiple SNPs into a *.tsv file  
   - Integrative plotting (showing error bars, −log₁₀(p), derived allele frequencies, etc.)  
 
-- **Phase-3**:  
+- **Phase 3**:  
   - Scans different time bins to date the onset of selection on SNP of interest (in generations & years)  
   - Performs optional bootstraps with user-defined settings to calculate confidence intervals around the estimated onset of selection   
   - Reporting of date of onset and corresponding confidence intervals in `*.json` file   
