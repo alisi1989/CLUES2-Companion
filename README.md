@@ -29,7 +29,7 @@ Outputs for Phase 1, Phase 2, and Phase 3, including log files, are automaticall
 **[Important]:** Users must keep the following folders exactly where they are
 
 Moving or renaming **any** of these folders – or this script itself –
-will interfere with the functioning of Phase 1, Phase 2 and Phase 3 algorithms.
+will interfere with the functioning of Phase 1, Phase 2, and Phase 3 algorithms.
 ---
 
 ## Table of Contents
