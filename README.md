@@ -82,8 +82,7 @@ Python 3.8+ \
 Relate v1.2.2 \
 CLUES2 (master branch) \
 GNU parallel (optional) \
-Python packages: numpy, pandas, matplotlib, adjustText
-
+Python packages: numpy, pandas, matplotlib, adjustText, biopython, cyvcf2, numba (e.g., pip install numpy)
 ```
 Example of installation of Python packages
 
