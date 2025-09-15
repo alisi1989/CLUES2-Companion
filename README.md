@@ -164,32 +164,31 @@ biopython \
 cyvcf2 \
 numba \
 tskit \
-```
+
 
 <a name="inputs"></a>
 
-Input file & folder layout tree
+### Input file 
 
-```
-CLUES2 Companion/
-├── CLUES2Companion.sh         # main driver
-├── Relate/                    # Relate bin/, scripts/
-├── CLUES2/                    # CLUES v2 scripts
-├── required_files/            # reference data
-│   ├ ancestor/…
-│   ├ mask/…
-│   └ map/…
-└── example/
-    ├ Finnish_chr2.vcf.gz      # phased and indexed vcf
-    └ Finnish.poplabels        # sampleID, population, group, SEX
-```
-Users must use fully phased vcf and indexed files (e.g., *.vcf.gz and *.tbi files). If your input data are GRCh38/hg38, please ensure chromosomes are encoded with prefix 'chr' (e.g. chr20). Alternatively, if your input data are GRCh37/hg19 please ensure chromosomes are encoded without prefix (e.g. 20)
+Users must provide fully phased VCF and indexed files (e.g., `*.vcf.gz` and corresponding `*.tbi` index).  
 
-Furthermore, the vcf file must contain only one population and one chromosome (e.g., example/Finnish_chr2.vcf.gz)
+- If your input data are **GRCh38/hg38**, please ensure chromosomes are encoded with the prefix `chr` (e.g., `chr20`).  
+- If your input data are **GRCh37/hg19**, please ensure chromosomes are encoded without the prefix (e.g., `20`).  
 
-In addition, the *.poplabels file must contain four columns (namely, sampleID, population, group, SEX)
+The VCF file must contain only one population and one chromosome (e.g., `example/Finnish_chr2.vcf.gz`).  
 
-Example of *.poplabels file for diploid organisms:
+---
+
+#### Relate pathway requirements
+In addition to the phased VCF, the Relate-based approach requires auxiliary resources:  
+
+- Ancestral FASTA file (e.g., `homo_sapiens_ancestor_chrN.fa`)  
+- Pilot mask file (e.g., `PilotMask_chrN.fasta`)  
+- Recombination map in Relate format (e.g., `genetic_map_chrN.txt`)  
+- A population labels file (`*.poplabels`) that contains four columns: sampleID, population, group, sex  
+
+Example of a `*.poplabels` file for diploid organisms [required for Relate]:  
+
 ```
 sample population group sex
 UNR1 FIN EUR NA
@@ -197,7 +196,20 @@ UNR2 FIN EUR NA
 UNR3 FIN EUR NA
 UNR4 FIN EUR NA
 ```
-For more information please refer to: `https://myersgroup.github.io/relate/input_data.html#Prepare`
+
+For more information please refer to the Relate manual:  
+`https://myersgroup.github.io/relate/input_data.html#Prepare`
+
+
+#### SINGER pathway requirements
+For the SINGER-based approach, input preparation is simpler:  
+
+- Only phased VCF and index files are required (e.g., `POP_chr2.vcf.gz` + `.tbi`)  
+- The genomic interval of interest (chromosome, start and end bp) must be specified by the user  
+
+Unlike Relate, **SINGER does not require** ancestral FASTA sequences, pilot mask files, or Relate-formatted recombination maps.  
+Allele frequencies are calculated directly from the VCF genotypes (ALT allele frequency by default), and polarization is optional.  
+
 
 ---
 
@@ -213,24 +225,44 @@ Menu prompts: choose Phase 1, Phase 2 or Phase 3.
 
 <a name="Phase1"></a>
 
-## Phase 1 – Run Relate to create input files for CLUES2 
+## Phase 1 – Run Relate or SINGER to create input files for CLUES2
 
-1 - Convert vcf to `*.haps`, `*.sample` \
-2 - Apply PrepareInputFiles.sh in Relate (to mask, flip, and filter SNPs) \
-3 - Run Relate mode All (with a user-specified Ne to generate the `*.anc` and `*.mut` files \
-4 - Apply EstimatePopulationSize.sh to generate the `*.coal` file \
-5 - Re-estimate branch lengths using the `*.coal` to generated updated `*.anc` and `*.mut` files \
-6 - Use the cyvcf2 package to extract, SNPs and corresponding positions within a user-specified target region \
-7 - Polarize derived alleles and compute derived allele frequency \
+---
+
+### Relate pathway
+
+1. Convert VCF to `*.haps` and `*.sample`  
+2. Apply `PrepareInputFiles.sh` in Relate (to mask, flip, and filter SNPs)  
+3. Run Relate mode `All` (with a user-specified Ne) to generate the `*.anc` and `*.mut` files  
+4. Apply `EstimatePopulationSize.sh` to generate the `*.coal` file  
+5. Re-estimate branch lengths using the `*.coal` to generate updated `*.anc` and `*.mut` files  
+6. Use the **cyvcf2** package to extract SNPs and corresponding positions within a user-specified target region  
+7. Polarize derived alleles and compute derived allele frequencies  
+
+---
+
+### SINGER pathway
+
+1. Provide a phased VCF (`*.vcf.gz` + index `*.tbi`) and specify the genomic interval of interest (chromosome, start, and end bp)  
+2. Run the `singer_master` binary on the chosen interval, providing the mutation rate (`-m`) and optionally:  
+   - effective population size (`--Ne`)  
+   - recombination-to-mutation ratio (`--ratio`)  
+   - recombination and/or mutation maps in SINGER format  
+3. SINGER directly infers the Ancestral Recombination Graph (ARG) and outputs it in native and `*.trees` (tskit) format  
+4. Convert results to consolidated `*.trees` using `convert_to_tskit.py` (stored in the Phase-1 output folder)  
+5. Extract SNPs and positions from the VCF using **cyvcf2**, restricted to the target interval  
+6. Compute allele frequencies for the ALT allele (polarization optional), saving them as `<OUT_PREFIX>_Frequency_chr<CHR>_<START>_<END>.txt`  
+7. Save all outputs (SNP list, frequency table, `.trees` ARG file) in `output_CLUES2Companion-Singer/phase1/<OUT_PREFIX>_chr<CHR>/`, which will serve as inputs for Phase 2  
+
 
 ## Example of usage of Phase 1
 
 ```
 ./CLUES2Companion.sh
-******  CLUES2 Companion – please cite CLUES2 and CLUES2Companion  ******
+******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
 Choose phase to run
-  1) Phase 1  : Apply Relate (*.mut, *.anc, *.coal files along with derived allele frequency) 
-  2) Phase 2  : Apply Relate (BranchLengths) and CLUES2 (RelateToCLUES.py and inference.py) 
+  1) Phase 1  : Apply Relate/Singer (*.mut, *.anc, *.coal or *.trees files along with derived allele frequency)
+  2) Phase 2  : Apply Relate (BranchLengths) or convert .trees (SingerToCLUES) and run CLUES2 to infer selection coefficient (s_MLE) along with table and figure
   3) Phase 3  : Date onset of selective sweeps of target SNP(s)
 Enter option (1/2/3):
 ```
@@ -241,51 +273,106 @@ Here, users have to make their choice. That is to say, they will have to enter e
 ```
 Enter option (1/2/3): 1   
 
+Which method do you want to use for genealogical inference?
+  1) Relate
+  2) SINGER
+```
+if 1 is selected then you have chosen to proceed with Relate:
+
+```
+Enter option (1/2): 1
 
           ╔═════════════════════════════════════════════════════════╗
-          ║        🚀  PHASE 1: RELATE & SNP EXTRACTION  🚀        ║
+          ║         🚀  PHASE 1: RELATE & SNP EXTRACTION  🚀        ║
           ║   Please read the manual carefully before proceeding    ║
           ╚═════════════════════════════════════════════════════════╝
 
 Choose the chromosome to analyze (e.g. 2, 17, X): 2
 Prefix of phased vcf/bcf file (e.g. example/Finnish without _chrN.vcf.gz): example/Finnish
-Path to population‑labels file (*.poplabels)(e.g. example/Finnish.poplabels): example/Finnish.poplabels
+Path to population-labels file (*.poplabels)(e.g. example/Finnish.poplabels): example/Finnish.poplabels
 Start bp of target region: 135839626
 End bp of target region: 135876443
-Prefix of output name (e.g. Finnish): Finnish
+Prefix of output name (e.g. Finnish): Finnish_MCM6
 ```
+
+if 2 is selected then you have chosen to proceed with Singer:
+
+```
+Enter option (1/2): 2
+
+          ╔═════════════════════════════════════════════════════════╗
+          ║     🧬  PHASE 1: SINGER – ARGs INFERENCE FROM VCF  🧬     ║
+          ║   Please read the manual carefully before proceeding    ║
+          ╚═════════════════════════════════════════════════════════╝
+
+Choose the chromosome to analyze (e.g. 2, 17, X): 2
+Prefix of phased VCF file (without _chrN.vcf): example/Finnish
+Output prefix name (e.g. Bedouin_MCM6): Finnish_MCM6
+Start bp of target region: 135839626
+End bp of target region: 135876443
+Mutation rate (-m, e.g. 1.25e-8): 1.25e-8
+Effective population size (-Ne) [Optional]: 
+Recombination/mutation ratio (-ratio) [Default: 1]: 
+Recombination map file (-recomb_map)[Optional]: 
+Mutation rate map file (-mut_map) [Optional]: 
+Number of MCMC samples (-n) [Default: 100]: 
+Thinning interval (-thin) [Default: 20]: 
+Site flip probability (-polar) [Default: 0.5]: 
+Random seed (-seed) [Default: 42]:
+```
+[IMPORTANT]: To work with Singer, you must have a *.vcf file, choose an output name (prefix), the mutation rate, and the start and end of the region of interest. \
+[Note: The start in Singer must correspond to position 0 for simplicity. Typically, the entire chromosome is processed. For simplicity, the final genomic position can be the end of the gene of interest if you want to save time.]
+
+All other inputs are optional and can be left at default or modified by the user according to their specific needs. Please refer to the Singer manual:
+https://github.com/popgenmethods/SINGER
+
 ### Explanation of Phase 1: required inputs and on-screen feedback
 
-`1 - Select the input data:`
+When running **Phase 1**, CLUES2Companion will guide the user through a series of interactive prompts. Depending on whether **Relate** or **SINGER** is chosen, the required and optional inputs differ slightly.
 
-| Prompt                                                          | What to type                   |
-| --------------------------------------------------------------- | ------------------------------ |
-| `Chromosome to analyze (e.g. 2, 17, X):`                        | chromosome number (e.g., 2)    |
-| `Prefix of phased vcf/bcf (Finnish without _chrN.vcf.gz):`      | e.g. `example/Finnish`         |
+---
 
+#### Relate pathway (required inputs)
 
-`2 - Define the target region"`
+| Prompt                                                          | Description                                                                 |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `Chromosome to analyze (e.g. 2, 17, X):`                        | Chromosome identifier                                                       |
+| `Prefix of phased vcf/bcf file (without _chrN.vcf.gz):`         | Prefix of input VCF file (e.g. `example/Finnish`)                           |
+| `Path to population-labels file (*.poplabels):`                 | File containing 4 columns: sampleID, population, group, sex (see example)    |
+| `Start bp of target region:`                                    | Genomic start coordinate of the region to analyse                            |
+| `End bp of target region:`                                      | Genomic end coordinate of the region to analyse                              |
+| `Prefix of output name:`                                        | Output prefix (must be reused consistently in Phases 2 and 3)                |
 
-| Prompt                       | Description                                       |
-| ---------------------------- | ------------------------------------------------- |
-| `Start bp of target region:` | genomic start coordinate of the window to analyse |
-| `End bp of target region:`   | genomic end coordinate of the window to analyse   |
+*Note:* Relate requires additional resources in the `required_files/` folder, such as the ancestral FASTA, pilot mask, and genetic maps.
 
+---
 
-All SNPs between these positions are extracted from the fully phased vcf.
+#### SINGER pathway (required inputs + optional parameters)
 
-`3 - Choose an output prefix:`
+| Prompt                                          | Description                                                                 |
+| ----------------------------------------------- | --------------------------------------------------------------------------- |
+| `Chromosome to analyze (e.g. 2, 17, X):`        | Chromosome identifier                                                       |
+| `Prefix of phased VCF file (without _chrN.vcf):`| Prefix of input VCF file (e.g. `example/Finnish`)                           |
+| `Output prefix name:`                           | Output prefix (must be reused consistently in Phases 2 and 3)                |
+| `Start bp of target region:`                    | Genomic start coordinate of the region to analyse                            |
+| `End bp of target region:`                      | Genomic end coordinate of the region to analyse                              |
+| `Mutation rate (-m):`                           | Mutation rate per bp per generation (required, e.g. `1.25e-8`)               |
+| `Effective population size (-Ne):`              | Optional effective population size                                           |
+| `Recombination/mutation ratio (-ratio):`        | Optional recombination-to-mutation ratio (default: 1)                        |
+| `Recombination map file (-recomb_map):`         | Optional recombination map in SINGER format                                  |
+| `Mutation rate map file (-mut_map):`            | Optional mutation rate map in SINGER format                                  |
+| `Number of MCMC samples (-n):`                  | Number of samples for inference (default: 100)                               |
+| `Thinning interval (-thin):`                    | Interval for thinning the MCMC chain (default: 20)                           |
+| `Site flip probability (-polar):`               | Probability of flipping alleles (default: 0.5)                               |
+| `Random seed (-seed):`                          | Random seed for reproducibility (default: 42)                                |
 
-| Prompt                                  | Description                                                                                     |
-| --------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `Prefix of output name:`                | e.g. `example/Finnish` **Important: You must use the exact same prefix in Phase 2 and Phase 3** |
+[IMPORTANT]: At minimum, users must provide a phased VCF, the region boundaries (start/end bp), an output prefix, and the mutation rate (`-m`). All other parameters are optional and default values will be applied if left blank.
 
+---
 
-### What you will see on the screen:
+During execution, the pipeline provides **on-screen feedback** with formatted banners (e.g. 🚀 Relate, 🧬 SINGER), status messages for each step, and automatic creation of the Phase-1 output folder (`output_CLUES2Companion-Relate/phase1/...` or `output_CLUES2Companion-Singer/phase1/...`).  
+This ensures that all necessary intermediate and final files (VCF-derived SNP list, frequency table, ARGs, and derived allele codings) are saved consistently for downstream analysis in Phase 2.
 
-Every major step prints an INFO line that indicates where the resulting files are saved (e.g., output_C2Companion/phase1/)
-
-While a step is running, a progress bar will move across the terminal. If something fails, you get a [WARN] or [ERROR] message; otherwise the step ends with the word `done!`.
 
 
 <a name="Phase2"></a>
