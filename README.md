@@ -70,7 +70,8 @@ Moving or renaming **any** of these folders – or the main script itself – wi
 - [Phase 2 (details)](#Phase2)  
 - [Phase 3 (details)](#Phase3)  
 - [Tips & troubleshooting](#tips)  
-- [License](#license)  
+- [License](#license)
+- [CLI version by command line](#cliversion)
 - [Contact](#contact)  
 
 ---
@@ -778,7 +779,167 @@ e.g, on *.json:
 }
 ```
 
-<a name="license"></a>
+---
+
+<a name="cliversion"></a>
+
+### Additional notes on available scripts for expert users:
+
+In addition to the main Bash pipeline (`CLUES2Companion.sh`), we also provide fully equivalent **Python CLI scripts** for each phase. These scripts allow advanced users to bypass interactive prompts and run the pipeline directly from the command line with customizable arguments.  
+
+The Python versions are:
+
+- `CLUES2Companion-Phase1.py`
+
+help from CLI Phase1:
+```
+python CLUES2Companion-Phase1.py --help
+usage: CLUES2Companion-Phase1.py [-h] --engine {Relate,Singer} --chr CHR --vcf_prefix VCF_PREFIX --out_prefix OUT_PREFIX --start START --end END
+                                           [--poplabels POPLABELS] [-m M] [-N N] [--mu MU] [--Ne NE] [--ratio RATIO] [--recomb RECOMB] [--mutmap MUTMAP] [-n N]
+                                           [--thin THIN] [--polar POLAR] [--seed SEED]
+
+CLUES2Companion Phase-1 CLI
+
+options:
+  -h, --help            show this help message and exit
+  --engine {Relate,Singer}
+                        Inference engine
+  --chr CHR             Chromosome (e.g. 2, X) [Relate/Singer]
+  --vcf_prefix VCF_PREFIX
+                        Prefix of VCF (without _chrN.vcf/.vcf.gz)[Relate/Singer]
+  --out_prefix OUT_PREFIX
+                        Output prefix name [Relate/Singer]
+  --start START         Start bp of region [Relate/Singer]
+  --end END             End bp of region [Relate/Singer]
+  --poplabels POPLABELS
+                        Population labels file (*.poplabels) [Relate]
+  -m M                  Mutation rate (Relate)
+  -N N                  Ne (Relate)
+  --mu MU               Mutation rate (Singer)
+  --Ne NE               Effective population size (Singer)
+  --ratio RATIO         Recomb/mutation ratio (Singer)
+  --recomb RECOMB       Recombination map (Singer)
+  --mutmap MUTMAP       Mutation map (Singer)
+  -n N                  MCMC samples (Singer)
+  --thin THIN           Thinning interval (Singer)
+  --polar POLAR         Site flip probability (Singer)
+  --seed SEED           Random seed (Singer)
+
+```
+- `CLUES2Companion-Phase2.py`  
+help from CLI Phase2:
+```
+python CLUES2Companion-Phase2.py --help
+usage: CLUES2Companion-Phase2.py [-h] --engine {Relate,Singer} --chr CHR --out_prefix OUT_PREFIX [--phase1_dir PHASE1_DIR] --tcutoff TCUTOFF --df DF
+                                           [--h H] [--anc_samps ANC_SAMPS] [--anc_haps ANC_HAPS] [--noTraj] [--CI CI] [--timeBins TIMEBINS]
+                                           [--num_samples NUM_SAMPLES] [--mu MU] [--region_start REGION_START] [--region_end REGION_END] [--Ne NE]
+
+CLUES2Companion Phase-2 CLI (Relate/SINGER → CLUES2)
+
+options:
+  -h, --help            show this help message and exit
+  --engine {Relate,Singer}
+                        Continue with Relate or Singer branch
+  --chr CHR             Chromosome (e.g. 2, X)
+  --out_prefix OUT_PREFIX
+                        Population/output prefix used in Phase-1
+  --phase1_dir PHASE1_DIR
+                        Override Phase-1 output directory (auto-detected by default)
+  --tcutoff TCUTOFF     tCutoff (e.g. 1000)
+  --df DF               df (e.g. 600)
+  --h H                 Dominance coefficient (default: 0.5, additive model)
+  --anc_samps ANC_SAMPS
+                        AncientSamps file (optional)
+  --anc_haps ANC_HAPS   AncientHaps file (optional)
+  --noTraj              Disable allele trajectory
+  --CI CI               Confidence interval (e.g. 0.95)
+  --timeBins TIMEBINS   Space/comma separated epoch breakpoints (optional)
+  --num_samples NUM_SAMPLES
+                        Importance sampling of branch lengths (Relate)
+  --mu MU               Mutation rate for SampleBranchLengths (Relate)
+  --region_start REGION_START
+                        START bp of region (Singer)
+  --region_end REGION_END
+                        END bp of region (Singer)
+  --Ne NE               Effective population size for inference.py (Singer)
+```
+
+- `CLUES2Companion-Phase3.py`  
+help from CLI Phase3:
+```
+python CLUES2Companion-Phase3.py --help
+usage: CLUES2Companion-Phase3.py [-h] --chr CHR --out_prefix OUT_PREFIX --rsid RSID --df DF --g_start G_START --g_end G_END [--step STEP]
+                                           [--phase1_dir PHASE1_DIR] [--phase2_dir PHASE2_DIR] [--bootstrap] [--boot_start BOOT_START] [--boot_end BOOT_END]
+                                           [--boot_step BOOT_STEP] [--nboot NBOOT] [--boot_df BOOT_DF] [--num_samples NUM_SAMPLES] [--mu MU] [--h H]
+
+CLUES2Companion Phase-3 CLI (Relate only) – Sliding-window dating + optional bootstrap
+
+options:
+  -h, --help            show this help message and exit
+  --chr CHR             Chromosome (e.g. 2, X)
+  --out_prefix OUT_PREFIX
+                        Population/output prefix used in Phase-1/2
+  --rsid RSID           Target SNP rsID to date (e.g. rs123)
+  --df DF               df score for CLUES2 (e.g. 600)
+  --g_start G_START     Initial epoch to scan (generations ago)
+  --g_end G_END         Final epoch to scan (generations ago)
+  --step STEP           Window size (non-overlapping), default 50
+  --phase1_dir PHASE1_DIR
+                        Override Phase-1 directory (auto-detected by default)
+  --phase2_dir PHASE2_DIR
+                        Override Phase-2 directory (auto-detected by default)
+  --bootstrap           Enable bootstrap dating
+  --boot_start BOOT_START
+                        Bootstrap scan START (generations ago)
+  --boot_end BOOT_END   Bootstrap scan END (generations ago)
+  --boot_step BOOT_STEP
+                        Bootstrap window size (default 25)
+  --nboot NBOOT         Number of bootstrap replicates (default 100)
+  --boot_df BOOT_DF     df score for CLUES2 in bootstrap (default 450)
+  --num_samples NUM_SAMPLES
+                        Importance sampling for SampleBranchLengths (required if --bootstrap)
+  --mu MU               Mutation rate for SampleBranchLengths (default 1.25e-8)
+  --h H                 Dominance coefficient (default: 0.5, additive model)
+
+
+```
+
+
+Furthermore, we also release an additional script:  
+
+- `CLUES2Companion-Linux-ExtractFromPreProcessed.py`
+help from CLI ExtractFromPreProcessed
+```
+python CLUES2Companion-ExtractFromPreProcessed.py --help
+usage: CLUES2Companion-ExtractFromPreProcessed.py [-h] --engine {Relate,Singer} --chr CHR --vcf_prefix VCF_PREFIX --out_prefix OUT_PREFIX --start START
+                                                        --end END [--haps HAPS] [--mut MUT]
+
+CLUES2Companion SNP/Derived/Freq extractor
+
+options:
+  -h, --help            show this help message and exit
+  --engine {Relate,Singer}
+  --chr CHR
+  --vcf_prefix VCF_PREFIX
+                        Prefix of VCF (without _chrN.vcf.gz)
+  --out_prefix OUT_PREFIX
+  --start START
+  --end END
+  --haps HAPS           HAPS file (Relate)
+  --mut MUT             MUT file (Relate)
+```
+
+This tool is designed for users who already preprocessed whole chromosomes with **Relate** or **SINGER** and wish to skip full Phase-1 execution.  
+Specifically:
+- For **Relate**, it extracts the derived allele files, SNP list, and frequency tables from existing outputs.  
+- For **SINGER**, it extracts SNPs and frequency information directly from the `.trees` outputs.  
+
+The extracted files are then immediately ready to be used as inputs for **Phase-2**, without the need to re-run the entire Phase-1 procedure.
+
+
+---
+
+<a name="license2"></a>
 
 License
 
