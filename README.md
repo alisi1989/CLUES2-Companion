@@ -129,9 +129,10 @@ Note: Relate and SINGER are not Conda packages.
 You can either:
 Use the precompiled versions included in the GitHub release (Relate-Linux/, Singer-Linux/), or download them from their official repositories and rename the folders as Relate/ and Singer/ (or Relate-Linux/, Singer-Linux/) to match our default scripts.
 
-```
+
 Required folder layout
 
+```
 Ensure your working directory contains the following subfolders:
 Relate/ or Relate-Linux/   contains Relate binaries and helper scripts  
 Singer/ or Singer-Linux/   contains SINGER binary  
@@ -148,20 +149,21 @@ pip3 install numpy pandas matplotlib adjustText biopython cyvcf2 numba tskit
 ```
 Complete list of dependencies to install if manually installation was choosen:
 
-Python ≥ 3.8
-Relate ≥ v1.2.2
-SINGER (latest master)
-CLUES2 (master branch)
-GNU parallel (optional, for bootstraps and batch runs)
+Python ≥ 3.8 \
+Relate ≥ v1.2.2 \
+SINGER (latest master) \
+CLUES2 (master branch) \
+GNU parallel (optional, for bootstraps and batch runs) \
+
 Python packages:
-numpy
-pandas
-matplotlib
-adjustText
-biopython
-cyvcf2
-numba
-tskit
+numpy \
+pandas \
+matplotlib \
+adjustText \
+biopython \
+cyvcf2 \
+numba \
+tskit \
 ```
 
 <a name="inputs"></a>
