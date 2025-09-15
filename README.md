@@ -354,7 +354,7 @@ When running **Phase 1**, CLUES2Companion will guide the user through a series o
 | `Chromosome to analyze (e.g. 2, 17, X):`        | Chromosome identifier                                                       |
 | `Prefix of phased VCF file (without _chrN.vcf):`| Prefix of input VCF file (e.g. `example/Finnish`)                           |
 | `Output prefix name:`                           | Output prefix (must be reused consistently in Phases 2 and 3)                |
-| `Start bp of target region:`                    | Genomic start coordinate of the region to analyse                            |
+| `Start bp of target region:`                    | Genomic start coordinate of the region to analyse [usualy 0]                 |
 | `End bp of target region:`                      | Genomic end coordinate of the region to analyse                              |
 | `Mutation rate (-m):`                           | Mutation rate per bp per generation (required, e.g. `1.25e-8`)               |
 | `Effective population size (-Ne):`              | Optional effective population size                                           |
@@ -377,13 +377,26 @@ This ensures that all necessary intermediate and final files (VCF-derived SNP li
 
 <a name="Phase2"></a>
 
-## Phase-2 – Selection coefficient inference
+## Phase 2 – Selection coefficient inference
 
-1 - Apply SampleBranchLengths.sh (Relate) to sample ancestral recombination graphs (ARGs) to generate Newick trees \
-2 - Apply RelateToCLUES.py (CLUES2) to generate *_times.txt \
-3 - Apply inference.py (CLUES2) to estimate selection coefficients and confidence intervals \
-4 - Merge summary statistics, rsID, genomic coordinates, and derived allele frequency into *.tsv file \
-5 - Generate tabular and graphical outputs \
+### Relate pathway
+1 - Apply `SampleBranchLengths.sh` (Relate) to sample ancestral recombination graphs (ARGs) and generate per-SNP Newick trees  
+2 - Apply `RelateToCLUES.py` (CLUES2) to convert each Newick tree into a `<rsID>_times.txt` file  
+3 - Apply `inference.py` (CLUES2) using the `<rsID>_times.txt` and derived allele frequency to estimate selection coefficients (s), confidence intervals, and P-values  
+4 - Merge summary statistics (rsID, genomic coordinates, derived allele frequency, logLR, −log10(p), s estimates, CIs) into a single `*.tsv` file  
+5 - Generate tabular and graphical outputs (multi-SNP selection plots, error bars, significance markers, etc.)  
+
+### SINGER pathway
+1 - Apply `SingerToCLUES.py` to extract per-SNP genealogical times directly from the ARGs (`.trees`) generated in Phase 1  
+2 - For each SNP in the user-defined region, produce a `<rsID>_times.txt` file in the Phase-2 directory  
+3 - Apply `inference.py` (CLUES2) using the `<rsID>_times.txt` and the allele frequency table from Phase 1; here, the effective population size parameter (`--N <Ne>`) is passed instead of a Relate `.coal` file  
+4 - Merge summary statistics (rsID, genomic coordinates, ALT/derived frequency, logLR, −log10(p), s estimates, CIs) into a single `*.tsv` file  
+5 - Generate the same integrative plots as in the Relate pathway (selection coefficients with CIs, −log10(p) intensities, SNP labels for significant variants)  
+
+### Key difference
+- **Relate** branch: requires `.coal` file and Newick conversion before running CLUES2  
+- **SINGER** branch: bypasses Newick, directly uses `.trees` to generate times via `SingerToCLUES.py`, and provides `--N` instead of `.coal`  
+- Both branches produce harmonized `*.tsv` summaries and graphical outputs, ensuring a consistent user experience.
 
 ---
 
@@ -392,81 +405,134 @@ This ensures that all necessary intermediate and final files (VCF-derived SNP li
 ```
 ******  CLUES2Companion – please cite CLUES2 and CLUES2Companion  ******
 Choose phase to run
-  1) Phase 1  : Apply Relate (*.mut, *.anc, *.coal files along with derived allele frequency) 
-  2) Phase 2  : Apply Relate (BranchLengths) and CLUES2 (RelateToCLUES.py and inference.py) 
+  1) Phase 1  : Apply Relate/Singer (*.mut, *.anc, *.coal or *.trees files along with derived allele frequency)
+  2) Phase 2  : Apply Relate (BranchLengths) or convert .trees (SingerToCLUES) and run CLUES2 to infer selection coefficient (s_MLE) along with table and figure
   3) Phase 3  : Date onset of selective sweeps of target SNP(s)
 Enter option (1/2/3): 2
 
-```
 
-`then`
-
-```
           ╔═════════════════════════════════════════════════════════╗
-          ║        🧬  PHASE-2 – (requires Phase‑1 outputs)  🧬     ║
+          ║       🧬  PHASE 2 – (requires Phase-1 outputs)  🧬      ║
           ║   Please read the manual carefully before proceeding    ║
           ╚═════════════════════════════════════════════════════════╝
 
+Which method do you want to continue with?
+  1) Relate
+  2) SINGER
+Enter option (1/2):1
+```
+if 1 is selected then you have chosen to proceed with Relate:
+
+```
 Choose the chromosome to analyze (e.g. 2, 17, X): 2
-Enter population prefix used in Phase‑1 (e.g., Finnish_MCM6): Finnish
-Phase 1 auto-detect directory [ENTER = /~/CLUES2Companion2/output_C2Companion/phase1/Finnish_MCM6_chr2] or provide a different folder with phase1 outputs :
+Enter population prefix used in Phase-1 (e.g. Finnish): Finnish_MCM6
+Phase-1 auto-detect directory [ENTER = /Users//CLUES2Companion/output_CLUES2Companion-Relate/phase1/Finnish_MCM6_chr2] or provide a different folder with phase1 outputs: 
 
-→ Using frequency file: ~/CLUES2Companion2/output_C2Companion/phase1/FIN_MCM6_chr2/Finnish_MCM6_Frequency_chr2_135839626_135876443.txt
-→ Using SNPs file: ~/CLUES2Companion2/output_C2Companion/phase1/FIN_MCM6_chr2/Finnish_MCM6_SNPs_chr2_135839626_135876443.txt
+→ Using frequency file: /Users/CLUES2Companion/output_CLUES2Companion-Relate/phase1/Finnish_MCM6_chr2/Finnish_MCM6_Frequency_chr2_135839626_135876443.txt
+→ Using SNPs file: /Users/alessandrolisi1989/desktop/CLUES2Companion_Review/CLUES2Companion/output_CLUES2Companion-Relate/phase1/Finnish_MCM6_chr2/Finnish_MCM6_SNPs_chr2_135839626_135876443.txt
 
-tCutoff (e.g. 1000): 500
+tCutoff (e.g. 1000): 500 
 df (e.g. 600): 600
-importance sampling of branch lengths: 200
 AncientSamps file (optional, ENTER to skip): 
 AncientHaps  file (optional, ENTER to skip): 
 Disable allele trajectory? (y/N): y
 Confidence interval (e.g. 0.95) [ENTER to skip]: 0.95
-TimeBins (a list of epoch breakpoints; optional, ENTER to skip):
+TimeBins (a list of epoch breakpoints; optional, ENTER to skip): 
+Dominance coefficient (default: 0.5, additive model): 
+Importance sampling of branch lengths: 200
 ```
 
+if 2 is selected then you have chosen to proceed with Singer:
+
+```
+Which method do you want to continue with?
+  1) Relate
+  2) SINGER
+Enter option (1/2): 2
+Choose the chromosome to analyze (e.g. 2, 17, X): 2
+Enter population prefix used in Phase-1 (e.g. Finnish): Finnish_MCM6
+Phase-1 auto-detect directory [ENTER = /Users/CLUES2Companion/output_CLUES2Companion-Singer/phase1/Finnish_chr22] or provide a different folder with phase1 outputs: 
+
+→ Using frequency file: /Users/CLUES2Companion/output_CLUES2Companion-Singer/phase1/Finnish_chr2/Finnish_Frequency_chr2_35604500_35643818.txt
+→ Using SNPs file: /Users/alessandrolisi1989/desktop/CLUES2Companion_Review/CLUES2Companion/output_CLUES2Companion-Singer/phase1/Finnish_chr2/Bedouin_SNPs_chr2_35604500_35643818.txt
+
+tCutoff (e.g. 1000): 500
+df (e.g. 600): 600
+AncientSamps file (optional, ENTER to skip): 
+AncientHaps  file (optional, ENTER to skip): 
+Disable allele trajectory? (y/N): y
+Confidence interval (e.g. 0.95) [ENTER to skip]: 0.95
+TimeBins (a list of epoch breakpoints; optional, ENTER to skip): 
+Dominance coefficient (default: 0.5, additive model): 
+Enter START bp of region: 135839626
+Enter END bp of region: 135876443
+Effective population size (Ne) for inference.py: 20000
+
+
+```
 ## Explanation of above command lines
 
-### Script prompts:
-Select the chromosome to analyze:
-**Chromosome to analyze (e.g., 2, 17, X):**
-If you run Phase 1 on several chromosomes, the pipeline automatically searches for the Phase 1 output that matches the chromosome that you enter above.
+### Script prompts (common to Relate and SINGER):
+**Chromosome to analyze (e.g., 2, 17, X):**  
+If you ran Phase 1 on several chromosomes, the pipeline automatically searches for the Phase 1 output that matches the chromosome you enter here.
 
-**Enter the population prefix:**
-Provide the same prefix you used in Phase 1 (e.g. Finnish). The Phase 2 script now knows the exact folder structure (e.g., output_C2Companion/phase1/Finnish_chr2/).
+**Population prefix (e.g. Finnish):**  
+Provide the same prefix you used in Phase 1. The Phase 2 script auto-detects the folder structure (e.g., `output_CLUES2Companion-Relate/phase1/Finnish_chr2/` or `output_CLUES2Companion-Singer/phase1/Finnish_chr2/`).
 
-**Confirm detected Phase 1 folders:**
-The script shows the path to the location of the following file: *.anc, *.mut, *.coal, SNP list (`*.txt`), and frequency table (`*.txt`).
-If the path is correct, press Enter to accept.
-If users have manually moved Phase 1 folder (which is not recommended), type the path to the location of the new directory and press Enter.
+**Confirm detected Phase 1 folders:**  
+The script shows the path to the SNP list (`*_SNPs.txt`) and frequency file (`*_Frequency.txt`).  
+If the path is correct, press Enter to accept.  
+If you manually moved Phase 1 folders (not recommended), provide the new path.
 
-### Mandatory CLUES2 parameters (please see CLUES2 and Relate manuals):
+---
 
-| Prompt                                    | Description                                          | Reference              |
-| ----------------------------------------- | ---------------------------------------------------- | ---------------------- |
-| `tCutoff (e.g. 1000):`                    | The maximum time (in generations)                    | CLUES2 `--tCutoff`    |
-| `df (e.g. 600):`                          | number of allele frequency bins                      | CLUES2 `--df`         |
-| `Importance sampling of branch lengths:`  | number of trees to sample from *Relate*              | Relate `--num_samples` |
+### Mandatory CLUES2 parameters (common):
+| Prompt                                  | Description                                    | Reference           |
+| --------------------------------------- | ---------------------------------------------- | ------------------- |
+| `tCutoff (e.g. 1000):`                  | Maximum generations to consider                | CLUES2 `--tCutoff` |
+| `df (e.g. 600):`                        | Number of allele frequency bins                | CLUES2 `--df`      |
 
-None of the above prompts can be left blank.
+These cannot be left blank.
 
-### Optional files (please see CLUES2 and Relate manuals):
+---
 
-`AncientSamps — table of sample ages`
-`AncientHaps — ancient haplotypes`
-`Press Enter to skip either file`
+### Relate-specific prompts:
+| Prompt                                    | Description                                              | Reference               |
+| ----------------------------------------- | -------------------------------------------------------- | ----------------------- |
+| `Importance sampling of branch lengths:`  | Number of trees to sample from Relate                    | Relate `--num_samples` |
 
-Please see the CLUES2 manual for examples of formatting
+Phase 2 will then:  
+1. Run **SampleBranchLengths.sh** using the `.coal` file from Phase 1.  
+2. Generate per-SNP Newick trees.  
+3. Call **RelateToCLUES.py** to produce `*_times.txt`.  
+4. Pass these to **inference.py** for selection inference.
 
-### Optional parameters to include (please see CLUES2 and Relate manuals):
+---
 
-| prompt                                  | effect                                                              |
-| --------------------------------------- | ------------------------------------------------------------------- |
-| `Disable allele trajectory? (y/N):`     | answer **y** to *skip* posterior trajectories speeds up inference   |
-| `Confidence intervals (e.g. 0.95):`     | compute CI for the selection coefficient (MLE); **Enter** = no CI   |
-| `TimeBins (e.g., 200 300):`             | split 0-*tCutoff* into custom intervals; *Enter* = single epoch     |
+### SINGER-specific prompts:
+| Prompt                                    | Description                                              | Reference               |
+| ----------------------------------------- | -------------------------------------------------------- | ----------------------- |
+| `Enter START bp of region:`               | Start coordinate of the target genomic window            | SINGER input            |
+| `Enter END bp of region:`                 | End coordinate of the target genomic window              | SINGER input            |
+| `Effective population size (Ne):`         | Demographic size parameter for CLUES2 inference          | CLUES2 `--N`           |
 
+Phase 2 will then:  
+1. Call **SingerToCLUES.py** with the `.trees` output from Phase 1 to generate per-SNP `*_times.txt`.  
+2. Run **inference.py**, passing `--N` (Ne) instead of a `.coal` file.  
+3. Summarize all results into a `.tsv` file and generate plots as for Relate.
 
-The example TimeBins 200 300 for a tCutoff 500 yields three epochs: 0-200, 200-300, 300-500.
+---
+
+### Optional parameters (both Relate and SINGER):
+| Prompt                                  | Effect                                                                 |
+| --------------------------------------- | ---------------------------------------------------------------------- |
+| `AncientSamps / AncientHaps`            | Include ancient samples if available                                   |
+| `Disable allele trajectory? (y/N):`     | Answer **y** to skip posterior trajectories (speeds up inference)      |
+| `Confidence intervals (e.g. 0.95):`     | Compute CI for the selection coefficient (MLE); Enter = no CI          |
+| `TimeBins (e.g., 200 300):`             | Split 0–tCutoff into custom epochs (e.g. 0-200, 200-300, 300-500)      |
+| `Dominance coefficient (default 0.5):`  | Define dominance (h); default is additive (h=0.5)                      |
+
+---
 
 ### Internal housekeeping:
 
