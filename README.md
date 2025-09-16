@@ -7,51 +7,51 @@ Regardless of the software of choice (i.e., **Relate** or **SINGER**), CLUES2 Co
 ---
 **Phase 1**
 - ### Relate-based approach:  
-  - Converts `.vcf` to `.haps` & `.sample`.
-  - Prepares input (masking, polarization with ancestral FASTA, recombination maps). 
-  - Runs **Relate** (producing `.anc`, `.mut`, `.coal`).  
-  - Generates a SNP list, per-SNP derived allele polarization, and derived allele frequency table.
+  - Converts `.vcf` to `.haps` & `.sample`. \
+  - Prepares input (masking, polarization with ancestral FASTA, recombination maps). \
+  - Runs **Relate** (producing `.anc`, `.mut`, `.coal`). \
+  - Generates a SNP list, per-SNP derived allele polarization, and derived allele frequency table. \
 
 - ### SINGER-based approach:  
-  - Runs **SINGER** directly on phased `.vcf` files with a user-specified genomic interval.
-  - Requires minimal input (mutation rate); optional parameters include Ne, recombination/mutation maps among others.
-  - Infers ARGs in `.trees` format file.  
-  - Generates a SNP list and computes allele frequency table (ALT-based by default).  
+  - Runs **SINGER** directly on phased `.vcf` files with a user-specified genomic interval. \
+  - Requires minimal input (mutation rate); optional parameters include Ne, recombination/mutation maps among others. \
+  - Infers ARGs in `.trees` format file. \
+  - Generates a SNP list and computes allele frequency table (ALT-based by default). \ 
 
 ---
 
 - **Phase 2**:
 - ### Relate-based approach:  
-  - Applies importance sampling of branch lengths, which is given in the `.coal` file.
-  - Generates per-SNP genealogies in `.newick` file. 
-  - Runs **RelateToCLUES.py** to create per-SNP genealogical times `*_times.txt` file.
-  - Runs **CLUES2** (`inference.py`) for selection inference (resulting files are `*_inference.txt` and the `*_CI.txt` which is optional). 
-  - Merges SNP results into a `.tsv` summary file.
-  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p).
+  - Applies importance sampling of branch lengths, which is given in the `.coal` file. \
+  - Generates per-SNP genealogies in `.newick` file. \
+  - Runs **RelateToCLUES.py** to create per-SNP genealogical times `*_times.txt` file. \
+  - Runs **CLUES2** (`inference.py`) for selection inference (resulting files are `*_inference.txt` and the `*_CI.txt` which is optional). \
+  - Merges SNP results into a `.tsv` summary file. \
+  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p). \
 
 - ### SINGER-based approach:  
-  - Uses **SingerToCLUES.py** to extract per-SNP genealogical times in `*_times.txt` file.
-  - Runs **CLUES2** (`inference.py`) with user-defined Ne (`--N`) instead of the Relate `.coal` file to infer selection coefficient.
-  - Merges SNP results into a `.tsv` summary file.  
-  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p). 
+  - Uses **SingerToCLUES.py** to extract per-SNP genealogical times in `*_times.txt` file. \
+  - Runs **CLUES2** (`inference.py`) with user-defined Ne (`--N`) instead of the Relate `.coal` file to infer selection coefficient. \
+  - Merges SNP results into a `.tsv` summary file. \
+  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p). \
 
 ---
 
 - **Phase 3** (with **Relate**):  
-  - Scans across time windows to date the onset of selection on a target SNP.  
-  - Produces onset estimates in generations and years.  
-  - Optionally performs bootstraps with user-defined settings to compute confidence intervals.  
-  - Saves results in JSON format (`*_Dating.json`, `*_Bootstrap_onset.json`) and associated log files.  
+  - Scans across time windows to date the onset of selection on a target SNP. \ 
+  - Produces onset estimates in generations and years. \
+  - Optionally performs bootstraps with user-defined settings to compute confidence intervals. \
+  - Saves results in JSON format (`*_Dating.json`, `*_Bootstrap_onset.json`) and associated log files. \  
 
 ---
 
 **[Important]**: Users must keep the following directories exactly where they are:
 
-- `Relate/` or `Relate-Linux/` (binaries + helper scripts)  
-- `Singer/` or `Singer-Linux/` (binaries)  
-- `CLUES2/` (e.g., inference.py, RelateToCLUES.py, SingerToCLUES.py)  
-- `required_files/` (e.g., ancestral FASTA, recombination maps, masks)  
-- auto-generated `phase1/`, `phase2/`, `phase3/` directories  
+- `Relate/` or `Relate-Linux/` (binaries + helper scripts) \
+- `Singer/` or `Singer-Linux/` (binaries) \
+- `CLUES2/` (e.g., inference.py, RelateToCLUES.py, SingerToCLUES.py) \
+- `required_files/` (e.g., ancestral FASTA, recombination maps, masks) \
+- auto-generated `phase1/`, `phase2/`, `phase3/` directories \
 
 Moving or renaming **any** of these folders – or the main script itself – will interfere with the functioning of the Phase 1, Phase 2, and Phase 3 pipelines.
 
@@ -95,8 +95,8 @@ cd CLUES2Companion
 
 Download the latest release (*.tar.gz or *.zip) from the "Releases" page.
 Each release includes:
-- CLUES2Companion shell (for non-expert users) and Python scripts (for expert users)
-- Required folders (CLUES2/, required_files/)
+- CLUES2Companion shell (for non-expert users) and Python scripts (for expert users) \
+- Required folders (CLUES2/, required_files/) \
 - A Clues2Companion.yml Conda environment file (which includes required dependencies)
 
 To use the CLUES2Companion shell script, users will need to apply the following steps: 
@@ -167,8 +167,8 @@ conda activate Clues2Companion
 
 Users must provide fully phased VCF and corresponding indexed files (e.g., `*.vcf.gz` and `*.tbi` index).  
 
-- If your input VCF is build **GRCh38/hg38**, please ensure chromosome numbers have the prefix `chr` (e.g., `chr20`).  
-- If your input VCF is build **GRCh37/hg19**, please ensure chromosome numbers do not have the prefix (e.g., `20`).  
+- If your input VCF is build **GRCh38/hg38**, please ensure chromosome numbers have the prefix `chr` (e.g., `chr20`). \
+- If your input VCF is build **GRCh37/hg19**, please ensure chromosome numbers do not have the prefix (e.g., `20`). \
 
 The VCF file must consist of only one population and one chromosome (e.g., `example/Finnish_chr2.vcf.gz`).  
 
@@ -178,9 +178,9 @@ The VCF file must consist of only one population and one chromosome (e.g., `exam
 
 In addition to the phased VCF, the Relate-based approach requires auxiliary resources:  
 
-- Ancestral FASTA file (e.g., `homo_sapiens_ancestor_chrN.fa`)  
-- Pilot mask file (e.g., `PilotMask_chrN.fasta`)  
-- Recombination map in Relate format (e.g., `genetic_map_chrN.txt`)  
+- Ancestral FASTA file (e.g., `homo_sapiens_ancestor_chrN.fa`) \
+- Pilot mask file (e.g., `PilotMask_chrN.fasta`) \
+- Recombination map in Relate format (e.g., `genetic_map_chrN.txt`) \
 - A population labels file (`*.poplabels`) that contains four columns: sampleID, population, group, sex  
 
 The following is an example of a `*.poplabels` file for diploid organisms:  
@@ -201,8 +201,8 @@ For more information, please refer to the **Relate** manual:
 
 For the SINGER-based approach, the required files are:  
 
-- Phased VCF and index files (e.g., `*_chr2.vcf.gz` + `*.tbi`)  
-- The genomic interval of interest (start position and end position in bp) must be specified by the user  
+- Phased VCF and index files (e.g., `*_chr2.vcf.gz` + `*.tbi`) \ 
+- The genomic interval of interest (start position and end position in bp) must be specified by the user \
 
 Unlike Relate, **SINGER** does not require ancestral FASTA sequences, pilot mask files, or recombination maps.   
 
@@ -226,7 +226,7 @@ Menu prompts: choose Phase 1, Phase 2, or Phase 3.
 
 ### Relate-based approach
 
-1. Convert VCF to `*.haps` and `*.sample`.
+1. Convert VCF to `*.haps` and `*.sample`. \
 2. Apply `PrepareInputFiles.sh` in Relate (to mask, flip, and filter SNPs).
 3. Run Relate mode `All` (with a user-specified Ne) to generate the `*.anc` and `*.mut` files. 
 4. Apply `EstimatePopulationSize.sh` to generate the `*.coal` file.  
