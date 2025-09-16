@@ -115,23 +115,7 @@ As a convenience, we also maintain a Dropbox mirror of the package:
 
 https://www.dropbox.com/scl/fo/m5y6aek0twd1jz9grg4p3/ALxMgIljUJRIZZNQXaGU-OE?rlkey=mbbh36ondftnqg0x07eao57eg&st=lryscqdm&dl=0
 
-
-<a name="dependencies"></a>
-
-## Dependencies
-
-We provide a Conda YAML file (Clues2Companion.yml) that installs all Python dependencies for the pipeline:
-
-```
-conda env create -f Clues2Companion.yml
-conda activate Clues2Companion
-```
-Note: Relate and SINGER are not Conda packages.
-You can either:
-Use the precompiled versions included in the GitHub release (Relate-Linux/, Singer-Linux/), or download them from their official repositories and rename the folders as Relate/ and Singer/ (or Relate-Linux/, Singer-Linux/) to match our default scripts.
-
-
-Required folder layout
+## Required folder layout
 
 ```
 Ensure your working directory contains the following subfolders:
@@ -142,11 +126,28 @@ required_files/            contains ancestral FASTA, recombination maps, masks, 
 phase1/, phase2/, phase3/  generated automatically by the pipeline
 Do not move or rename these folders, otherwise Phase 1–3 will fail.
 If you need to reorganize, update the paths inside the scripts accordingly.
+
 ```
+
+<a name="dependencies"></a>
+
+## Dependencies
+
+We provide a Conda YAML file (Clues2Companion.yml) that installs all Python dependencies for the pipeline:
+
+```
+conda env create -f Clues2Companion.yml
+conda activate Clues2Companion
+
+```
+
 If using Conda, these packages will be installed automatically from Clues2Companion.yml.
-If installing manually, you can install the Python dependencies with:
+
+Otherwise, if installing manually, you can install the Python dependencies with:
+
 ```
 pip3 install numpy pandas matplotlib adjustText biopython cyvcf2 numba tskit
+
 ```
 Complete list of dependencies to install if manually installation was choosen:
 
@@ -169,7 +170,9 @@ tskit \
 
 <a name="inputs"></a>
 
-### Input file 
+---
+
+## Input file 
 
 Users must provide fully phased VCF and indexed files (e.g., `*.vcf.gz` and corresponding `*.tbi` index).  
 
@@ -180,7 +183,7 @@ The VCF file must contain only one population and one chromosome (e.g., `example
 
 ---
 
-#### Relate pathway requirements
+### Relate pathway requirements
 In addition to the phased VCF, the Relate-based approach requires auxiliary resources:  
 
 - Ancestral FASTA file (e.g., `homo_sapiens_ancestor_chrN.fa`)  
@@ -202,7 +205,7 @@ For more information please refer to the Relate manual:
 `https://myersgroup.github.io/relate/input_data.html#Prepare`
 
 
-#### SINGER pathway requirements
+### SINGER pathway requirements
 For the SINGER-based approach, input preparation is simpler:  
 
 - Only phased VCF and index files are required (e.g., `POP_chr2.vcf.gz` + `.tbi`)  
