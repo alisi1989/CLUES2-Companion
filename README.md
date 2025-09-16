@@ -6,42 +6,42 @@ Regardless of the software of choice (i.e., **Relate** or **SINGER**), CLUES2 Co
 
 ---
 **Phase 1**
-- ### Relate-based Approach:  
-  - Converts `.vcf` to `.haps` & `.sample`  
-  - Prepares input (masking, polarization with ancestral FASTA, recombination maps)  
-  - Runs **Relate** (producing `.anc`, `.mut`, `.coal`)  
-  - Generates a SNP list, per-SNP derived allele polarization, and derived allele frequency table  
+- ### Relate-based approach:  
+  - Converts `.vcf` to `.haps` & `.sample`.
+  - Prepares input (masking, polarization with ancestral FASTA, recombination maps). 
+  - Runs **Relate** (producing `.anc`, `.mut`, `.coal`).  
+  - Generates a SNP list, per-SNP derived allele polarization, and derived allele frequency table.
 
-- ### SINGER-based Approach:  
-  - Runs **SINGER** directly on phased `.vcf` files with a user-specified genomic interval  
-  - Requires minimal input (mutation rate); optional parameters include Ne, recombination/mutation maps among others
-  - Infers ARGs in `.trees` format file  
-  - Generates a SNP list and computes allele frequency table (ALT-based by default)  
+- ### SINGER-based approach:  
+  - Runs **SINGER** directly on phased `.vcf` files with a user-specified genomic interval.
+  - Requires minimal input (mutation rate); optional parameters include Ne, recombination/mutation maps among others.
+  - Infers ARGs in `.trees` format file.  
+  - Generates a SNP list and computes allele frequency table (ALT-based by default).  
 
 ---
 
 - **Phase 2**:
-- ### Relate-based Approach:  
-  - Applies importance sampling of branch lengths, which is given in the `.coal` file  
-  - Generates per-SNP genealogies in `.newick` file  
-  - Runs **RelateToCLUES.py** to create per-SNP genealogical times `*_times.txt` file
-  - Runs **CLUES2** (`inference.py`) for selection inference (resulting files are `*_inference.txt` and the `*_CI.txt` which is optional)  
-  - Merges SNP results into a `.tsv` summary file  
-  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p)
+- ### Relate-based approach:  
+  - Applies importance sampling of branch lengths, which is given in the `.coal` file.
+  - Generates per-SNP genealogies in `.newick` file. 
+  - Runs **RelateToCLUES.py** to create per-SNP genealogical times `*_times.txt` file.
+  - Runs **CLUES2** (`inference.py`) for selection inference (resulting files are `*_inference.txt` and the `*_CI.txt` which is optional). 
+  - Merges SNP results into a `.tsv` summary file.
+  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p).
 
-- ### SINGER-based Approach:  
-  - Uses **SingerToCLUES.py** to extract per-SNP genealogical times in `*_times.txt` file 
-  - Runs **CLUES2** (`inference.py`) with user-defined Ne (`--N`) instead of the Relate `.coal` file to infer selection coefficient
-  - Merges SNP results into a `.tsv` summary file  
-  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p)  
+- ### SINGER-based approach:  
+  - Uses **SingerToCLUES.py** to extract per-SNP genealogical times in `*_times.txt` file.
+  - Runs **CLUES2** (`inference.py`) with user-defined Ne (`--N`) instead of the Relate `.coal` file to infer selection coefficient.
+  - Merges SNP results into a `.tsv` summary file.  
+  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p). 
 
 ---
 
 - **Phase 3** (with **Relate**):  
-  - Scans across time windows to date the onset of selection on a target SNP  
-  - Produces onset estimates in generations and years  
-  - Optionally performs bootstraps with user-defined settings to compute confidence intervals  
-  - Saves results in JSON format (`*_Dating.json`, `*_Bootstrap_onset.json`) and associated log files  
+  - Scans across time windows to date the onset of selection on a target SNP.  
+  - Produces onset estimates in generations and years.  
+  - Optionally performs bootstraps with user-defined settings to compute confidence intervals.  
+  - Saves results in JSON format (`*_Dating.json`, `*_Bootstrap_onset.json`) and associated log files.  
 
 ---
 
@@ -111,7 +111,7 @@ Alternatively, we also maintain a Dropbox mirror of the package as a back-up:
 
 https://www.dropbox.com/scl/fo/m5y6aek0twd1jz9grg4p3/ALxMgIljUJRIZZNQXaGU-OE?rlkey=mbbh36ondftnqg0x07eao57eg&st=lryscqdm&dl=0
 
-Please note that the example files are present in this Dropbox repository
+Please note that the example files are present in this Dropbox repository.
 
 ## Required folder layout
 
@@ -194,8 +194,8 @@ UNR4 FIN EUR NA
 ```
 
 For more information, please refer to the **Relate** manual:  
-`https://myersgroup.github.io/relate/input_data.html#Prepare`
 
+`https://myersgroup.github.io/relate/input_data.html#Prepare`
 
 ### SINGER-based requirements
 
@@ -224,30 +224,30 @@ Menu prompts: choose Phase 1, Phase 2, or Phase 3.
 
 ---
 
-### Relate-based Approach
+### Relate-based approach
 
-1. Convert VCF to `*.haps` and `*.sample`  
-2. Apply `PrepareInputFiles.sh` in Relate (to mask, flip, and filter SNPs)  
-3. Run Relate mode `All` (with a user-specified Ne) to generate the `*.anc` and `*.mut` files  
-4. Apply `EstimatePopulationSize.sh` to generate the `*.coal` file  
-5. Re-estimate branch lengths using the `*.coal` to generate updated `*.anc` and `*.mut` files  
-6. Use the **cyvcf2** package to extract SNPs and corresponding positions within a user-specified target region  
-7. Polarize derived alleles and compute derived allele frequencies  
+1. Convert VCF to `*.haps` and `*.sample`.
+2. Apply `PrepareInputFiles.sh` in Relate (to mask, flip, and filter SNPs).
+3. Run Relate mode `All` (with a user-specified Ne) to generate the `*.anc` and `*.mut` files. 
+4. Apply `EstimatePopulationSize.sh` to generate the `*.coal` file.  
+5. Re-estimate branch lengths using the `*.coal` to generate updated `*.anc` and `*.mut` files. 
+6. Use the **cyvcf2** package to extract SNPs and corresponding positions within a user-specified target region. 
+7. Polarize derived alleles and compute derived allele frequencies.  
 
 ---
 
-### SINGER-based Approach
+### SINGER-based approach
 
-1. Provide a phased VCF (`*.vcf.gz` + index `*.tbi`) and specify the genomic interval of interest (start position and end position in bp)  
+1. Provide a phased VCF (`*.vcf.gz` + index `*.tbi`) and specify the genomic interval of interest (start position and end position in bp).
 2. Run the `singer_master` binary on the chosen interval, providing the mutation rate (`-m`) and optionally the following parameters:  
    - effective population size (`--Ne`)  
    - recombination-to-mutation ratio (`--ratio`)  
    - recombination and/or mutation maps in SINGER format  
-3. SINGER directly infers the Ancestral Recombination Graph (ARG) and outputs the results in `*.branches` file  
-4. Convert the results in `*.branches` files to `*.trees` files using `convert_to_tskit.py` script (these files can be found in the phase1 output folder)  
-5. Extract SNPs and positions from the VCF witin the user-specified range using **cyvcf2**
-6. Calculate allele frequencies for the ALT allele, which are saved in the `<OUT_PREFIX>_Frequency_chr<CHR>_<START>_<END>.txt` file
-7. All output files are saved in `output_CLUES2Companion-Singer/phase1/<OUT_PREFIX>_chr<CHR>/` and will serve as input files for Phase 2  
+3. SINGER directly infers the Ancestral Recombination Graph (ARG) and outputs the results in `*.branches` file. 
+4. Convert the results in `*.branches` files to `*.trees` files using `convert_to_tskit.py` script (these files can be found in the phase1 output folder).  
+5. Extract SNPs and positions from the VCF witin the user-specified range using **cyvcf2**.
+6. Calculate allele frequencies for the ALT allele, which are saved in the `<OUT_PREFIX>_Frequency_chr<CHR>_<START>_<END>.txt` file.
+7. All output files are saved in `output_CLUES2Companion-Singer/phase1/<OUT_PREFIX>_chr<CHR>/` and will serve as input files for Phase 2.
 
 
 ## Example of Phase 1 usage
@@ -371,30 +371,32 @@ When running **Phase 1**, CLUES2 Companion will guide the user through a series 
 
 ---
 
-During the execution of CLUES2 Companion, the Phase 1 pipeline provides **on-screen feedback** with formatted banners (e.g., 🚀 Relate, 🧬 SINGER), status messages for each step, and automatic creation of the phase1 output folder (`output_CLUES2Companion-Relate/phase1/...` or `output_CLUES2Companion-Singer/phase1/...`).  
+During the execution of CLUES2 Companion, the Phase 1 pipeline provides **on-screen feedback** with formatted banners (e.g., 🚀 Relate, 🧬 SINGER), status messages for each step, and automatic creation of the Phase 1 output folder (`output_CLUES2Companion-Relate/phase1/...` or `output_CLUES2Companion-Singer/phase1/...`).  
 All necessary intermediate and final files (VCF-derived SNP list, frequency table, ARGs, and derived allele frequency) are conveniently saved for downstream Phase 2 analysis.
-
 
 
 <a name="Phase2"></a>
 
 ## Phase 2 – Selection coefficient inference
 
-### Relate-based Approach
+### Relate-based approach
+
 1 - Apply `SampleBranchLengths.sh` (Relate) to sample ancestral recombination graphs (ARGs) and generate per-SNP Newick trees in`*.newick` files. 
 2 - Apply `RelateToCLUES.py` (CLUES2) to convert each Newick tree into a `<rsID>_times.txt` file. 
 3 - Apply `inference.py` (CLUES2) using the `<rsID>_times.txt`file and the derived allele frequency to estimate selection coefficients (s), confidence intervals, and −log10(p).
 4 - Merge summary statistics (rsID, genomic coordinates, derived allele frequency, logLR, −log10(p), s estimates, CIs) into a single `*.tsv` file.  
 5 - Generate tabular and graphical outputs (multi-SNP selection plots, error bars, −log10(p), etc.).  
 
-### SINGER-based Approach
-1 - Apply `SingerToCLUES.py` to extract per-SNP genealogical times directly from the ARGs (in `*.trees` files) generated in Phase 1  
+### SINGER-based approach
+
+1 - Apply `SingerToCLUES.py` to extract per-SNP genealogical times directly from the ARGs (in `*.trees` files) generated in Phase 1.
 2 - For each SNP in the user-defined region, produce `<rsID>_times.txt` files.  
 3 - Apply `inference.py` (CLUES2) using the `<rsID>_times.txt` file and the allele frequency table from Phase 1; here, the effective population size parameter (`--N <Ne>`) is specified by the user instead of a Relate `.coal` file.
 4 - Merge summary statistics (rsID, genomic coordinates, ALT/derived frequency, logLR, −log10(p), s estimates, confidence intervals) into a single `*.tsv` file.
 5 - tabular and graphical outputs (e.g., multi-SNP selection plots, error bars, −log10(p)).  
 
 ### Key differences between the Relate- and SINGER- based approaches
+
 - To infer branch lengths with **Relate**, the `*.coal` and `*.newick` files are required prior to running CLUES2. 
 - To infer branch lengths with **SINGER**, the `*.newick` file is not required but instead SINGER uses the `.trees` file directly to generate genealogical times (via `SingerToCLUES.py` script). Furthermore, SINGER uses Ne `--N` to infer the branch length instead of the `.coal` file. 
 - In the end, both Relate and SINGER generate `*.tsv` file that summarizes statistics for each SNP along with the graphical outputs. 
@@ -480,7 +482,8 @@ Effective population size (Ne) for inference.py: 20000
 ```
 ## Explanation of above parameters
 
-### Script prompts (shared between Relate and SINGER):
+### Script prompts (shared between Relate and SINGER)
+
 **Chromosome to analyze (e.g., 2, 17, X):**  
 If you ran Phase 1 on several chromosomes, the pipeline automatically searches for the Phase 1 output that matches the chromosome in Phase 2.
 
@@ -492,7 +495,8 @@ The script shows the path to the SNP list (`*_SNPs.txt`) and frequency file (`*_
 
 ---
 
-### Mandatory CLUES2 parameters (shared):
+### Mandatory CLUES2 parameters (shared)
+
 | Prompt                                  | Description                                    | Reference           |
 | --------------------------------------- | ---------------------------------------------- | ------------------- |
 | `tCutoff (e.g. 1000):`                  | Maximum generations to consider                | CLUES2 `--tCutoff` |
@@ -502,12 +506,14 @@ These parameters cannot be left blank.
 
 ---
 
-### Relate-specific prompts:
+### Relate-specific prompts
+
 | Prompt                                    | Description                                              | Reference               |
 | ----------------------------------------- | -------------------------------------------------------- | ----------------------- |
 | `Importance sampling of branch lengths:`  | Number of trees to sample from Relate                    | Relate `--num_samples` |
 
-Phase 2 will then:  
+Phase 2 will then: 
+
 1. Run **SampleBranchLengths.sh** using the `.coal` file from Phase 1.  
 2. Generate per-SNP Newick trees.  
 3. Call **RelateToCLUES.py** to produce `*_times.txt`.  
@@ -515,7 +521,8 @@ Phase 2 will then:
 
 ---
 
-### SINGER-specific prompts:
+### SINGER-specific prompts
+
 | Prompt                                    | Description                                              | Reference               |
 | ----------------------------------------- | -------------------------------------------------------- | ----------------------- |
 | `Enter START bp of region:`               | Start coordinate of the target genomic window*           | SINGER input            |
@@ -525,38 +532,40 @@ Phase 2 will then:
 *Users should note that the start position should not be 0, but instead it should be the actual start position (i.e. genomic coordinate) for the region of interest.
 
 Phase 2 will then:  
+
 1. Call **SingerToCLUES.py** use the information in the `.trees` output from Phase 1 to generate per-SNP `*_times.txt`.  
 2. Run **inference.py**, passing `--N` (Ne) instead of a `.coal` file.  
 3. Summarize results in a `.tsv` file and generate plots as for Relate.
 
 ---
 
-### Optional parameters (for both Relate and SINGER):
+### Optional parameters (for both Relate and SINGER)
+
 | Prompt                                  | Effect                                                                 |
 | --------------------------------------- | ---------------------------------------------------------------------- |
 | `AncientSamps / AncientHaps`            | Include ancient samples if available                                   |
 | `Disable allele trajectory? (y/N):`     | Answer **y** to skip posterior trajectories (speeds up inference)      |
-| `Confidence intervals (e.g. 0.95):`     | Compute CI for the selection coefficient (s); Enter = no CI          |
+| `Confidence intervals (e.g. 0.95):`     | Compute CI for the selection coefficient (s); Enter = no CI            |
 | `TimeBins (e.g., 200 300):`             | Split 0–tCutoff into custom epochs (e.g. 0-200, 200-300, 300-500)      |
 | `Dominance coefficient (default 0.5):`  | Define dominance (h); default is additive (h=0.5)                      |
 
 ---
 
-### Internal housekeeping:
+### Output files
 
 NOTE: All output files will be saved to `~/Output_C2Companion/phase2/{prefix}_chr{N}/`. In this example, output files are saved in `~/Output_C2Companion/phase2/Finnish_MCM6_chr2/)`
 
-### The resulting plot will contain:
+1. The resulting plot will contain:
 
-SNPs analyzed in Phase 2 \
-Confidence intervals \ 
-Color intensity bar `[−log₁₀(p)]` \ 
-Astericks indicating significance above each SNP (specifically, * (0.05), ** (0.01), *** (0.001)) 
+- SNPs analyzed in Phase 2 \
+- Confidence intervals \ 
+- Color intensity bar `[−log₁₀(p)]` \ 
+- Astericks indicating significance above each SNP (specifically, * (0.05), ** (0.01), *** (0.001))  
 
+2. The *.tsv file contains SNP information, including related statistics calculated by CLUES2. 
 
-### The *.tsv file contains SNP information, including related statistics calculated by CLUES2. 
+Example of `*.tsv file`: 
 
-**Example of `*.tsv file`**
 ```
 rsID	POS	der_freq	logLR	-log10(p)	Epoch1_start	Epoch1_end	SelectionMLE1	95%_lower	95%_upper
 rs55809728	135842606	0.0909	3.5508	2.11	0	536	0.09981	0.05336	0.14626
