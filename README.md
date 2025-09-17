@@ -9,39 +9,39 @@ Regardless of the software of choice (i.e., **Relate** or **SINGER**), CLUES2 Co
 - ### Relate-based approach:  
   - Converts `.vcf` to `.haps` & `.sample` 
   - Prepares input (masking, polarization with ancestral FASTA, recombination maps) 
-  - Runs **Relate** (producing `.anc`, `.mut`, `.coal`). \
-  - Generates a SNP list, per-SNP derived allele polarization, and derived allele frequency table. \
+  - Runs **Relate** (producing `.anc`, `.mut`, `.coal`)
+  - Generates a SNP list, per-SNP derived allele polarization, and derived allele frequency table
 
 - ### SINGER-based approach:  
-  - Runs **SINGER** directly on phased `.vcf` files with a user-specified genomic interval. \
-  - Requires minimal input (mutation rate); optional parameters include Ne, recombination/mutation maps among others. \
-  - Infers ARGs in `.trees` format file. \
-  - Generates a SNP list and computes allele frequency table (ALT-based by default). \ 
+  - Runs **SINGER** directly on phased `.vcf` files with a user-specified genomic interval
+  - Requires minimal input (mutation rate); optional parameters include Ne, recombination/mutation maps among others
+  - Infers ARGs in `.trees` format file
+  - Generates a SNP list and computes allele frequency table (ALT-based by default) 
 
 ---
 
 - **Phase 2**:
 - ### Relate-based approach:  
-  - Applies importance sampling of branch lengths, which is given in the `.coal` file. \
-  - Generates per-SNP genealogies in `.newick` file. \
-  - Runs **RelateToCLUES.py** to create per-SNP genealogical times `*_times.txt` file. \
-  - Runs **CLUES2** (`inference.py`) for selection inference (resulting files are `*_inference.txt` and the `*_CI.txt` which is optional). \
-  - Merges SNP results into a `.tsv` summary file. \
-  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p). \
+  - Applies importance sampling of branch lengths, which is given in the `.coal` file
+  - Generates per-SNP genealogies in `.newick` file
+  - Runs **RelateToCLUES.py** to create per-SNP genealogical times `*_times.txt` file
+  - Runs **CLUES2** (`inference.py`) for selection inference (resulting files are `*_inference.txt` and the `*_CI.txt` which is optional)
+  - Merges SNP results into a `.tsv` summary file
+  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p)
 
 - ### SINGER-based approach:  
-  - Uses **SingerToCLUES.py** to extract per-SNP genealogical times in `*_times.txt` file. \
-  - Runs **CLUES2** (`inference.py`) with user-defined Ne (`--N`) instead of the Relate `.coal` file to infer selection coefficient. \
-  - Merges SNP results into a `.tsv` summary file. \
-  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p). \
+  - Uses **SingerToCLUES.py** to extract per-SNP genealogical times in `*_times.txt` file
+  - Runs **CLUES2** (`inference.py`) with user-defined Ne (`--N`) instead of the Relate `.coal` file to infer selection coefficient
+  - Merges SNP results into a `.tsv` summary file
+  - Generates integrative plots showing selection coefficients (s), associated confidence intervals, and −log₁₀(p)
 
 ---
 
 - **Phase 3** (with **Relate**):  
-  - Scans across time windows to date the onset of selection on a target SNP. \ 
-  - Produces onset estimates in generations and years. \
-  - Optionally performs bootstraps with user-defined settings to compute confidence intervals. \
-  - Saves results in JSON format (`*_Dating.json`, `*_Bootstrap_onset.json`) and associated log files. \  
+  - Scans across time windows to date the onset of selection on a target SNP 
+  - Produces onset estimates in generations and years
+  - Optionally performs bootstraps with user-defined settings to compute confidence intervals
+  - Saves results in JSON format (`*_Dating.json`, `*_Bootstrap_onset.json`) and associated log files  
 
 ---
 
@@ -167,8 +167,8 @@ conda activate Clues2Companion
 
 Users must provide fully phased VCF and corresponding indexed files (e.g., `*.vcf.gz` and `*.tbi` index).  
 
-- If your input VCF is build **GRCh38/hg38**, please ensure chromosome numbers have the prefix `chr` (e.g., `chr20`). \
-- If your input VCF is build **GRCh37/hg19**, please ensure chromosome numbers do not have the prefix (e.g., `20`). \
+- If your input VCF is build **GRCh38/hg38**, please ensure chromosome numbers have the prefix `chr` (e.g., `chr20`)
+- If your input VCF is build **GRCh37/hg19**, please ensure chromosome numbers do not have the prefix (e.g., `20`)
 
 The VCF file must consist of only one population and one chromosome (e.g., `example/Finnish_chr2.vcf.gz`).  
 
@@ -226,7 +226,7 @@ Menu prompts: choose Phase 1, Phase 2, or Phase 3.
 
 ### Relate-based approach
 
-1. Convert VCF to `*.haps` and `*.sample`. \
+1. Convert VCF to `*.haps` and `*.sample`
 2. Apply `PrepareInputFiles.sh` in Relate (to mask, flip, and filter SNPs).
 3. Run Relate mode `All` (with a user-specified Ne) to generate the `*.anc` and `*.mut` files. 
 4. Apply `EstimatePopulationSize.sh` to generate the `*.coal` file.  
@@ -320,7 +320,7 @@ Thinning interval (-thin) [Default: 20]:
 Site flip probability (-polar) [Default: 0.5]: 
 Random seed (-seed) [Default: 42]:
 ```
-[IMPORTANT]: To work with SINGER, you must have a *.vcf file, choose an output name (prefix), the mutation rate, as well as the the start and end positions of genomic region of interest. \
+[IMPORTANT]: To work with SINGER, you must have a *.vcf file, choose an output name (prefix), the mutation rate, as well as the the start and end positions of genomic region of interest
 [Note: The start position in SINGER must be 0. The end position will be end of the region of interest which is inputted by the user.]
 
 All other parameters are optional and can be left at default or modified by the user according to their specific needs. For more information, please refer to the SINGER manual:
