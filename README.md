@@ -7,8 +7,8 @@ Regardless of the software of choice (i.e., **Relate** or **SINGER**), CLUES2 Co
 ---
 **Phase 1**
 - ### Relate-based approach:  
-  - Converts `.vcf` to `.haps` & `.sample`. \
-  - Prepares input (masking, polarization with ancestral FASTA, recombination maps). \
+  - Converts `.vcf` to `.haps` & `.sample` \
+  - Prepares input (masking, polarization with ancestral FASTA, recombination maps) \
   - Runs **Relate** (producing `.anc`, `.mut`, `.coal`). \
   - Generates a SNP list, per-SNP derived allele polarization, and derived allele frequency table. \
 
