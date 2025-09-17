@@ -381,25 +381,25 @@ All necessary intermediate and final files (VCF-derived SNP list, frequency tabl
 
 ### Relate-based approach
 
-1 - Apply `SampleBranchLengths.sh` (Relate) to sample ancestral recombination graphs (ARGs) and generate per-SNP Newick trees in`*.newick` files. 
-2 - Apply `RelateToCLUES.py` (CLUES2) to convert each Newick tree into a `<rsID>_times.txt` file. 
-3 - Apply `inference.py` (CLUES2) using the `<rsID>_times.txt`file and the derived allele frequency to estimate selection coefficients (s), confidence intervals, and −log10(p).
-4 - Merge summary statistics (rsID, genomic coordinates, derived allele frequency, logLR, −log10(p), s estimates, CIs) into a single `*.tsv` file.  
-5 - Generate tabular and graphical outputs (multi-SNP selection plots, error bars, −log10(p), etc.).  
+1 - Apply `SampleBranchLengths.sh` (Relate) to sample ancestral recombination graphs (ARGs) and generate per-SNP Newick trees in`*.newick` files \
+2 - Apply `RelateToCLUES.py` (CLUES2) to convert each Newick tree into a `<rsID>_times.txt` file \
+3 - Apply `inference.py` (CLUES2) using the `<rsID>_times.txt`file and the derived allele frequency to estimate selection coefficients (s), confidence intervals, and −log10(p) \
+4 - Merge summary statistics (rsID, genomic coordinates, derived allele frequency, logLR, −log10(p), s estimates, CIs) into a single `*.tsv` file \
+5 - Generate tabular and graphical outputs (multi-SNP selection plots, error bars, −log10(p), etc.)
 
 ### SINGER-based approach
 
-1 - Apply `SingerToCLUES.py` to extract per-SNP genealogical times directly from the ARGs (in `*.trees` files) generated in Phase 1.
-2 - For each SNP in the user-defined region, produce `<rsID>_times.txt` files.  
-3 - Apply `inference.py` (CLUES2) using the `<rsID>_times.txt` file and the allele frequency table from Phase 1; here, the effective population size parameter (`--N <Ne>`) is specified by the user instead of a Relate `.coal` file.
-4 - Merge summary statistics (rsID, genomic coordinates, ALT/derived frequency, logLR, −log10(p), s estimates, confidence intervals) into a single `*.tsv` file.
-5 - tabular and graphical outputs (e.g., multi-SNP selection plots, error bars, −log10(p)).  
+1 - Apply `SingerToCLUES.py` to extract per-SNP genealogical times directly from the ARGs (in `*.trees` files) generated in Phase 1 \
+2 - For each SNP in the user-defined region, produce `<rsID>_times.txt` files \
+3 - Apply `inference.py` (CLUES2) using the `<rsID>_times.txt` file and the allele frequency table from Phase 1; here, the effective population size parameter (`--N <Ne>`) is specified by the user instead of a Relate `.coal` file \
+4 - Merge summary statistics (rsID, genomic coordinates, ALT/derived frequency, logLR, −log10(p), s estimates, confidence intervals) into a single `*.tsv` file \
+5 - tabular and graphical outputs (e.g., multi-SNP selection plots, error bars, −log10(p))
 
 ### Key differences between the Relate- and SINGER- based approaches
 
-- To infer branch lengths with **Relate**, the `*.coal` and `*.newick` files are required prior to running CLUES2. 
-- To infer branch lengths with **SINGER**, the `*.newick` file is not required but instead SINGER uses the `.trees` file directly to generate genealogical times (via `SingerToCLUES.py` script). Furthermore, SINGER uses Ne `--N` to infer the branch length instead of the `.coal` file. 
-- In the end, both Relate and SINGER generate `*.tsv` file that summarizes statistics for each SNP along with the graphical outputs. 
+- To infer branch lengths with **Relate**, the `*.coal` and `*.newick` files are required prior to running CLUES2 \
+- To infer branch lengths with **SINGER**, the `*.newick` file is not required but instead SINGER uses the `.trees` file directly to generate genealogical times (via `SingerToCLUES.py` script). Furthermore, SINGER uses Ne `--N` to infer the branch length instead of the `.coal` file \
+- In the end, both Relate and SINGER generate `*.tsv` file that summarizes statistics for each SNP along with the graphical outputs \
 
 ---
 
