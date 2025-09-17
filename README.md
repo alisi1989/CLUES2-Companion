@@ -87,7 +87,7 @@ Before running any part of this package, please read the `README_before_use.txt`
 Clone the repository from GitHub and move into the directory:
 
 ```bash
-git clone https://github.com/<YourRepo>/CLUES2Companion.git
+git clone https://github.com/alisi1989/CLUES2-Companion.git
 cd CLUES2Companion
 ```
 
@@ -101,9 +101,11 @@ Each release includes:
 
 To use the CLUES2Companion shell script, users will need to apply the following steps: 
 ```
-tar -xvzf CLUES2Companion_vX.Y.tar.gz
+tar -xvzf CLUES2Companion.tar.gz
 cd CLUES2Companion
 chmod +x CLUES2Companion.sh
+or
+python CLUES2Companion-Phase1.py
 ```
 
 ### 3. Dropbox mirror (backup)
