@@ -1,0 +1,44 @@
+name: Clues2Companion
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - cyvcf2
+  - numpy
+  - pandas
+  - matplotlib
+  - adjusttext
+  - seaborn
+  - scipy
+  - pip
+  - pip:
+      - tskit
+      - msprime
+
+
+# Important: Relate and Singer executables are not Conda packages.
+# You can either:
+#   (i) use the precompiled binaries provided in our GitHub release
+#       (Relate-Linux/ and Singer-Linux/ folders), or
+#   (ii) download them from the official Relate and Singer repositories.
+
+# After downloading, rename the folders to:
+#     Relate/   or Relate-Linux/
+#     Singer/   or Singer-Linux/
+# and place them in the same directory as CLUES2Companion.
+
+# Required reference data (ancestral FASTA, mask files, recombination maps)
+# can be obtained from the official Relate Dropbox or from our release.
+# Place these in the "required_files/" folder.
+
+# To set up the environment (Python dependencies):
+
+#conda env create -f Clues2Companion.yml
+#conda activate Clues2Companion
+
+# Once activated, you can immediately run Phase 1, Phase 2, and Phase 3
+# using either the Relate or Singer pathways.
+
+

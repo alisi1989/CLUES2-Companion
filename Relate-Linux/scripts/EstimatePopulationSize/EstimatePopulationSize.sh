@@ -1341,6 +1341,6 @@ then
 fi
 
 #plot results
-Rscript ${DIR}/plot_population_size.R ${output} ${years_per_gen}
+#Rscript ${DIR}/plot_population_size.R ${output} ${years_per_gen}
 
 
