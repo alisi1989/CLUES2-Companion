@@ -82,7 +82,7 @@ Before running any part of this package, please read the `README_before_use.txt`
 
 ---
 
-### 1. GitHub (recommended)
+### 1. GitHub (precompiled)
 
 Clone the repository from GitHub and move into the directory:
 
@@ -91,7 +91,7 @@ git clone https://github.com/<YourRepo>/CLUES2Companion.git
 cd CLUES2Companion
 ```
 
-### 2. Release package (precompiled)
+### 2. Release package (recommended)
 
 Download the latest release (*.tar.gz or *.zip) from the "Releases" page.
 Each release includes:
