@@ -111,7 +111,7 @@ python CLUES2Companion-Phase1.py
 ### 3. Dropbox mirror (backup)
 Alternatively, we also maintain a Dropbox mirror of the package as a back-up:
 
-https://www.dropbox.com/scl/fo/m5y6aek0twd1jz9grg4p3/ALxMgIljUJRIZZNQXaGU-OE?rlkey=mbbh36ondftnqg0x07eao57eg&st=lryscqdm&dl=0
+bit.ly/4mrlpiT
 
 Please note that the example files are present in this Dropbox repository.
 
