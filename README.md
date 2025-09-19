@@ -9,8 +9,8 @@ Regardless of the software of choice (i.e., **Relate** or **SINGER**), CLUES2 Co
 - ### Relate-based approach:  
   - Converts `.vcf` to `.haps` & `.sample` 
   - Prepares input (masking, polarization with ancestral FASTA, recombination maps) 
-  - Runs **Relate** (producing `.anc`, `.mut`, `.coal`)
-  - Generates a SNP list, per-SNP derived allele polarization, and derived allele frequency table
+  - Runs **Relate** (producing `.anc`, `.mut`, `.coal`) for the entire chromosome of interest
+  - Generates a SNP list, per-SNP derived allele polarization, and derived allele frequency table for the user specified target region
 
 - ### SINGER-based approach:  
   - Runs **SINGER** directly on phased `.vcf` files with a user-specified genomic interval
